@@ -1,0 +1,6 @@
+*.tgz
+.DS_Store
+bin/basic
+build.sh
+tmp/
+.go-version
