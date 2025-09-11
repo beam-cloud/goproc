@@ -20,18 +20,14 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type GetContentRequest struct {
+type ExecProcessRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
-
-	Hash   string `protobuf:"bytes,1,opt,name=hash,proto3" json:"hash,omitempty"`      // Hash of the content to retrieve
-	Offset int64  `protobuf:"varint,2,opt,name=offset,proto3" json:"offset,omitempty"` // Offset into the content
-	Length int64  `protobuf:"varint,3,opt,name=length,proto3" json:"length,omitempty"` // Length of the content to retrieve
 }
 
-func (x *GetContentRequest) Reset() {
-	*x = GetContentRequest{}
+func (x *ExecProcessRequest) Reset() {
+	*x = ExecProcessRequest{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_goproc_proto_msgTypes[0]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -39,13 +35,13 @@ func (x *GetContentRequest) Reset() {
 	}
 }
 
-func (x *GetContentRequest) String() string {
+func (x *ExecProcessRequest) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetContentRequest) ProtoMessage() {}
+func (*ExecProcessRequest) ProtoMessage() {}
 
-func (x *GetContentRequest) ProtoReflect() protoreflect.Message {
+func (x *ExecProcessRequest) ProtoReflect() protoreflect.Message {
 	mi := &file_goproc_proto_msgTypes[0]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -57,43 +53,19 @@ func (x *GetContentRequest) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetContentRequest.ProtoReflect.Descriptor instead.
-func (*GetContentRequest) Descriptor() ([]byte, []int) {
+// Deprecated: Use ExecProcessRequest.ProtoReflect.Descriptor instead.
+func (*ExecProcessRequest) Descriptor() ([]byte, []int) {
 	return file_goproc_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *GetContentRequest) GetHash() string {
-	if x != nil {
-		return x.Hash
-	}
-	return ""
-}
-
-func (x *GetContentRequest) GetOffset() int64 {
-	if x != nil {
-		return x.Offset
-	}
-	return 0
-}
-
-func (x *GetContentRequest) GetLength() int64 {
-	if x != nil {
-		return x.Length
-	}
-	return 0
-}
-
-type GetContentResponse struct {
+type ExecProcessResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
-
-	Ok      bool   `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
-	Content []byte `protobuf:"bytes,2,opt,name=content,proto3" json:"content,omitempty"` // Content data
 }
 
-func (x *GetContentResponse) Reset() {
-	*x = GetContentResponse{}
+func (x *ExecProcessResponse) Reset() {
+	*x = ExecProcessResponse{}
 	if protoimpl.UnsafeEnabled {
 		mi := &file_goproc_proto_msgTypes[1]
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -101,13 +73,13 @@ func (x *GetContentResponse) Reset() {
 	}
 }
 
-func (x *GetContentResponse) String() string {
+func (x *ExecProcessResponse) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*GetContentResponse) ProtoMessage() {}
+func (*ExecProcessResponse) ProtoMessage() {}
 
-func (x *GetContentResponse) ProtoReflect() protoreflect.Message {
+func (x *ExecProcessResponse) ProtoReflect() protoreflect.Message {
 	mi := &file_goproc_proto_msgTypes[1]
 	if protoimpl.UnsafeEnabled && x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -119,818 +91,26 @@ func (x *GetContentResponse) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use GetContentResponse.ProtoReflect.Descriptor instead.
-func (*GetContentResponse) Descriptor() ([]byte, []int) {
+// Deprecated: Use ExecProcessResponse.ProtoReflect.Descriptor instead.
+func (*ExecProcessResponse) Descriptor() ([]byte, []int) {
 	return file_goproc_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *GetContentResponse) GetOk() bool {
-	if x != nil {
-		return x.Ok
-	}
-	return false
-}
-
-func (x *GetContentResponse) GetContent() []byte {
-	if x != nil {
-		return x.Content
-	}
-	return nil
-}
-
-type HasContentRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Hash string `protobuf:"bytes,1,opt,name=hash,proto3" json:"hash,omitempty"` // Hash of the content to check
-}
-
-func (x *HasContentRequest) Reset() {
-	*x = HasContentRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_goproc_proto_msgTypes[2]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *HasContentRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*HasContentRequest) ProtoMessage() {}
-
-func (x *HasContentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_goproc_proto_msgTypes[2]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use HasContentRequest.ProtoReflect.Descriptor instead.
-func (*HasContentRequest) Descriptor() ([]byte, []int) {
-	return file_goproc_proto_rawDescGZIP(), []int{2}
-}
-
-func (x *HasContentRequest) GetHash() string {
-	if x != nil {
-		return x.Hash
-	}
-	return ""
-}
-
-type HasContentResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Ok     bool `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
-	Exists bool `protobuf:"varint,2,opt,name=exists,proto3" json:"exists,omitempty"`
-}
-
-func (x *HasContentResponse) Reset() {
-	*x = HasContentResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_goproc_proto_msgTypes[3]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *HasContentResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*HasContentResponse) ProtoMessage() {}
-
-func (x *HasContentResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_goproc_proto_msgTypes[3]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use HasContentResponse.ProtoReflect.Descriptor instead.
-func (*HasContentResponse) Descriptor() ([]byte, []int) {
-	return file_goproc_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *HasContentResponse) GetOk() bool {
-	if x != nil {
-		return x.Ok
-	}
-	return false
-}
-
-func (x *HasContentResponse) GetExists() bool {
-	if x != nil {
-		return x.Exists
-	}
-	return false
-}
-
-type StoreContentRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Content []byte `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
-}
-
-func (x *StoreContentRequest) Reset() {
-	*x = StoreContentRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_goproc_proto_msgTypes[4]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *StoreContentRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*StoreContentRequest) ProtoMessage() {}
-
-func (x *StoreContentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_goproc_proto_msgTypes[4]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use StoreContentRequest.ProtoReflect.Descriptor instead.
-func (*StoreContentRequest) Descriptor() ([]byte, []int) {
-	return file_goproc_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *StoreContentRequest) GetContent() []byte {
-	if x != nil {
-		return x.Content
-	}
-	return nil
-}
-
-type StoreContentResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Ok   bool   `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
-	Hash string `protobuf:"bytes,2,opt,name=hash,proto3" json:"hash,omitempty"` // Hash of the stored content
-}
-
-func (x *StoreContentResponse) Reset() {
-	*x = StoreContentResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_goproc_proto_msgTypes[5]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *StoreContentResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*StoreContentResponse) ProtoMessage() {}
-
-func (x *StoreContentResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_goproc_proto_msgTypes[5]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use StoreContentResponse.ProtoReflect.Descriptor instead.
-func (*StoreContentResponse) Descriptor() ([]byte, []int) {
-	return file_goproc_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *StoreContentResponse) GetOk() bool {
-	if x != nil {
-		return x.Ok
-	}
-	return false
-}
-
-func (x *StoreContentResponse) GetHash() string {
-	if x != nil {
-		return x.Hash
-	}
-	return ""
-}
-
-type StoreContentFromSourceWithLockResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Hash                string `protobuf:"bytes,1,opt,name=hash,proto3" json:"hash,omitempty"` // Hash of the stored content
-	Ok                  bool   `protobuf:"varint,2,opt,name=ok,proto3" json:"ok,omitempty"`
-	FailedToAcquireLock bool   `protobuf:"varint,3,opt,name=failed_to_acquire_lock,json=failedToAcquireLock,proto3" json:"failed_to_acquire_lock,omitempty"`
-	ErrorMsg            string `protobuf:"bytes,4,opt,name=error_msg,json=errorMsg,proto3" json:"error_msg,omitempty"`
-}
-
-func (x *StoreContentFromSourceWithLockResponse) Reset() {
-	*x = StoreContentFromSourceWithLockResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_goproc_proto_msgTypes[6]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *StoreContentFromSourceWithLockResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*StoreContentFromSourceWithLockResponse) ProtoMessage() {}
-
-func (x *StoreContentFromSourceWithLockResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_goproc_proto_msgTypes[6]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use StoreContentFromSourceWithLockResponse.ProtoReflect.Descriptor instead.
-func (*StoreContentFromSourceWithLockResponse) Descriptor() ([]byte, []int) {
-	return file_goproc_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *StoreContentFromSourceWithLockResponse) GetHash() string {
-	if x != nil {
-		return x.Hash
-	}
-	return ""
-}
-
-func (x *StoreContentFromSourceWithLockResponse) GetOk() bool {
-	if x != nil {
-		return x.Ok
-	}
-	return false
-}
-
-func (x *StoreContentFromSourceWithLockResponse) GetFailedToAcquireLock() bool {
-	if x != nil {
-		return x.FailedToAcquireLock
-	}
-	return false
-}
-
-func (x *StoreContentFromSourceWithLockResponse) GetErrorMsg() string {
-	if x != nil {
-		return x.ErrorMsg
-	}
-	return ""
-}
-
-type GetStateRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-}
-
-func (x *GetStateRequest) Reset() {
-	*x = GetStateRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_goproc_proto_msgTypes[7]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *GetStateRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetStateRequest) ProtoMessage() {}
-
-func (x *GetStateRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_goproc_proto_msgTypes[7]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetStateRequest.ProtoReflect.Descriptor instead.
-func (*GetStateRequest) Descriptor() ([]byte, []int) {
-	return file_goproc_proto_rawDescGZIP(), []int{7}
-}
-
-type GetStateResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Ok               bool    `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
-	Version          string  `protobuf:"bytes,2,opt,name=version,proto3" json:"version,omitempty"`
-	CapacityUsagePct float32 `protobuf:"fixed32,3,opt,name=capacity_usage_pct,json=capacityUsagePct,proto3" json:"capacity_usage_pct,omitempty"`
-	PrivateIpAddr    string  `protobuf:"bytes,4,opt,name=private_ip_addr,json=privateIpAddr,proto3" json:"private_ip_addr,omitempty"`
-}
-
-func (x *GetStateResponse) Reset() {
-	*x = GetStateResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_goproc_proto_msgTypes[8]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *GetStateResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetStateResponse) ProtoMessage() {}
-
-func (x *GetStateResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_goproc_proto_msgTypes[8]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetStateResponse.ProtoReflect.Descriptor instead.
-func (*GetStateResponse) Descriptor() ([]byte, []int) {
-	return file_goproc_proto_rawDescGZIP(), []int{8}
-}
-
-func (x *GetStateResponse) GetOk() bool {
-	if x != nil {
-		return x.Ok
-	}
-	return false
-}
-
-func (x *GetStateResponse) GetVersion() string {
-	if x != nil {
-		return x.Version
-	}
-	return ""
-}
-
-func (x *GetStateResponse) GetCapacityUsagePct() float32 {
-	if x != nil {
-		return x.CapacityUsagePct
-	}
-	return 0
-}
-
-func (x *GetStateResponse) GetPrivateIpAddr() string {
-	if x != nil {
-		return x.PrivateIpAddr
-	}
-	return ""
-}
-
-type CacheSource struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Path        string `protobuf:"bytes,1,opt,name=path,proto3" json:"path,omitempty"`
-	BucketName  string `protobuf:"bytes,2,opt,name=bucket_name,json=bucketName,proto3" json:"bucket_name,omitempty"`
-	Region      string `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
-	EndpointUrl string `protobuf:"bytes,4,opt,name=endpoint_url,json=endpointUrl,proto3" json:"endpoint_url,omitempty"`
-	AccessKey   string `protobuf:"bytes,5,opt,name=access_key,json=accessKey,proto3" json:"access_key,omitempty"`
-	SecretKey   string `protobuf:"bytes,6,opt,name=secret_key,json=secretKey,proto3" json:"secret_key,omitempty"`
-}
-
-func (x *CacheSource) Reset() {
-	*x = CacheSource{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_goproc_proto_msgTypes[9]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *CacheSource) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CacheSource) ProtoMessage() {}
-
-func (x *CacheSource) ProtoReflect() protoreflect.Message {
-	mi := &file_goproc_proto_msgTypes[9]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CacheSource.ProtoReflect.Descriptor instead.
-func (*CacheSource) Descriptor() ([]byte, []int) {
-	return file_goproc_proto_rawDescGZIP(), []int{9}
-}
-
-func (x *CacheSource) GetPath() string {
-	if x != nil {
-		return x.Path
-	}
-	return ""
-}
-
-func (x *CacheSource) GetBucketName() string {
-	if x != nil {
-		return x.BucketName
-	}
-	return ""
-}
-
-func (x *CacheSource) GetRegion() string {
-	if x != nil {
-		return x.Region
-	}
-	return ""
-}
-
-func (x *CacheSource) GetEndpointUrl() string {
-	if x != nil {
-		return x.EndpointUrl
-	}
-	return ""
-}
-
-func (x *CacheSource) GetAccessKey() string {
-	if x != nil {
-		return x.AccessKey
-	}
-	return ""
-}
-
-func (x *CacheSource) GetSecretKey() string {
-	if x != nil {
-		return x.SecretKey
-	}
-	return ""
-}
-
-type StoreContentFromSourceRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Source *CacheSource `protobuf:"bytes,1,opt,name=source,proto3" json:"source,omitempty"`
-}
-
-func (x *StoreContentFromSourceRequest) Reset() {
-	*x = StoreContentFromSourceRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_goproc_proto_msgTypes[10]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *StoreContentFromSourceRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*StoreContentFromSourceRequest) ProtoMessage() {}
-
-func (x *StoreContentFromSourceRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_goproc_proto_msgTypes[10]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use StoreContentFromSourceRequest.ProtoReflect.Descriptor instead.
-func (*StoreContentFromSourceRequest) Descriptor() ([]byte, []int) {
-	return file_goproc_proto_rawDescGZIP(), []int{10}
-}
-
-func (x *StoreContentFromSourceRequest) GetSource() *CacheSource {
-	if x != nil {
-		return x.Source
-	}
-	return nil
-}
-
-type StoreContentFromSourceResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Ok       bool   `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
-	Hash     string `protobuf:"bytes,2,opt,name=hash,proto3" json:"hash,omitempty"`
-	ErrorMsg string `protobuf:"bytes,3,opt,name=error_msg,json=errorMsg,proto3" json:"error_msg,omitempty"`
-}
-
-func (x *StoreContentFromSourceResponse) Reset() {
-	*x = StoreContentFromSourceResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_goproc_proto_msgTypes[11]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *StoreContentFromSourceResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*StoreContentFromSourceResponse) ProtoMessage() {}
-
-func (x *StoreContentFromSourceResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_goproc_proto_msgTypes[11]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use StoreContentFromSourceResponse.ProtoReflect.Descriptor instead.
-func (*StoreContentFromSourceResponse) Descriptor() ([]byte, []int) {
-	return file_goproc_proto_rawDescGZIP(), []int{11}
-}
-
-func (x *StoreContentFromSourceResponse) GetOk() bool {
-	if x != nil {
-		return x.Ok
-	}
-	return false
-}
-
-func (x *StoreContentFromSourceResponse) GetHash() string {
-	if x != nil {
-		return x.Hash
-	}
-	return ""
-}
-
-func (x *StoreContentFromSourceResponse) GetErrorMsg() string {
-	if x != nil {
-		return x.ErrorMsg
-	}
-	return ""
-}
-
-type GetAvailableHostsRequest struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Locality string `protobuf:"bytes,1,opt,name=locality,proto3" json:"locality,omitempty"`
-}
-
-func (x *GetAvailableHostsRequest) Reset() {
-	*x = GetAvailableHostsRequest{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_goproc_proto_msgTypes[12]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *GetAvailableHostsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetAvailableHostsRequest) ProtoMessage() {}
-
-func (x *GetAvailableHostsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_goproc_proto_msgTypes[12]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetAvailableHostsRequest.ProtoReflect.Descriptor instead.
-func (*GetAvailableHostsRequest) Descriptor() ([]byte, []int) {
-	return file_goproc_proto_rawDescGZIP(), []int{12}
-}
-
-func (x *GetAvailableHostsRequest) GetLocality() string {
-	if x != nil {
-		return x.Locality
-	}
-	return ""
-}
-
-type GetAvailableHostsResponse struct {
-	state         protoimpl.MessageState
-	sizeCache     protoimpl.SizeCache
-	unknownFields protoimpl.UnknownFields
-
-	Ok bool `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
-}
-
-func (x *GetAvailableHostsResponse) Reset() {
-	*x = GetAvailableHostsResponse{}
-	if protoimpl.UnsafeEnabled {
-		mi := &file_goproc_proto_msgTypes[13]
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		ms.StoreMessageInfo(mi)
-	}
-}
-
-func (x *GetAvailableHostsResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetAvailableHostsResponse) ProtoMessage() {}
-
-func (x *GetAvailableHostsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_goproc_proto_msgTypes[13]
-	if protoimpl.UnsafeEnabled && x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetAvailableHostsResponse.ProtoReflect.Descriptor instead.
-func (*GetAvailableHostsResponse) Descriptor() ([]byte, []int) {
-	return file_goproc_proto_rawDescGZIP(), []int{13}
-}
-
-func (x *GetAvailableHostsResponse) GetOk() bool {
-	if x != nil {
-		return x.Ok
-	}
-	return false
 }
 
 var File_goproc_proto protoreflect.FileDescriptor
 
 var file_goproc_proto_rawDesc = []byte{
 	0x0a, 0x0c, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x06,
-	0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x22, 0x57, 0x0a, 0x11, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x6e,
-	0x74, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x68,
-	0x61, 0x73, 0x68, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x68, 0x61, 0x73, 0x68, 0x12,
-	0x16, 0x0a, 0x06, 0x6f, 0x66, 0x66, 0x73, 0x65, 0x74, 0x18, 0x02, 0x20, 0x01, 0x28, 0x03, 0x52,
-	0x06, 0x6f, 0x66, 0x66, 0x73, 0x65, 0x74, 0x12, 0x16, 0x0a, 0x06, 0x6c, 0x65, 0x6e, 0x67, 0x74,
-	0x68, 0x18, 0x03, 0x20, 0x01, 0x28, 0x03, 0x52, 0x06, 0x6c, 0x65, 0x6e, 0x67, 0x74, 0x68, 0x22,
-	0x3e, 0x0a, 0x12, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x73,
-	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x6f, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28,
-	0x08, 0x52, 0x02, 0x6f, 0x6b, 0x12, 0x18, 0x0a, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74,
-	0x18, 0x02, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x22,
-	0x27, 0x0a, 0x11, 0x48, 0x61, 0x73, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04, 0x68, 0x61, 0x73, 0x68, 0x18, 0x01, 0x20, 0x01,
-	0x28, 0x09, 0x52, 0x04, 0x68, 0x61, 0x73, 0x68, 0x22, 0x3c, 0x0a, 0x12, 0x48, 0x61, 0x73, 0x43,
-	0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e,
-	0x0a, 0x02, 0x6f, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x02, 0x6f, 0x6b, 0x12, 0x16,
-	0x0a, 0x06, 0x65, 0x78, 0x69, 0x73, 0x74, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52, 0x06,
-	0x65, 0x78, 0x69, 0x73, 0x74, 0x73, 0x22, 0x2f, 0x0a, 0x13, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x43,
-	0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x18, 0x0a,
-	0x07, 0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0c, 0x52, 0x07,
-	0x63, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x22, 0x3a, 0x0a, 0x14, 0x53, 0x74, 0x6f, 0x72, 0x65,
-	0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12,
-	0x0e, 0x0a, 0x02, 0x6f, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x02, 0x6f, 0x6b, 0x12,
-	0x12, 0x0a, 0x04, 0x68, 0x61, 0x73, 0x68, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x68,
-	0x61, 0x73, 0x68, 0x22, 0x9e, 0x01, 0x0a, 0x26, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x43, 0x6f, 0x6e,
-	0x74, 0x65, 0x6e, 0x74, 0x46, 0x72, 0x6f, 0x6d, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x57, 0x69,
-	0x74, 0x68, 0x4c, 0x6f, 0x63, 0x6b, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x12,
-	0x0a, 0x04, 0x68, 0x61, 0x73, 0x68, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x68, 0x61,
-	0x73, 0x68, 0x12, 0x0e, 0x0a, 0x02, 0x6f, 0x6b, 0x18, 0x02, 0x20, 0x01, 0x28, 0x08, 0x52, 0x02,
-	0x6f, 0x6b, 0x12, 0x33, 0x0a, 0x16, 0x66, 0x61, 0x69, 0x6c, 0x65, 0x64, 0x5f, 0x74, 0x6f, 0x5f,
-	0x61, 0x63, 0x71, 0x75, 0x69, 0x72, 0x65, 0x5f, 0x6c, 0x6f, 0x63, 0x6b, 0x18, 0x03, 0x20, 0x01,
-	0x28, 0x08, 0x52, 0x13, 0x66, 0x61, 0x69, 0x6c, 0x65, 0x64, 0x54, 0x6f, 0x41, 0x63, 0x71, 0x75,
-	0x69, 0x72, 0x65, 0x4c, 0x6f, 0x63, 0x6b, 0x12, 0x1b, 0x0a, 0x09, 0x65, 0x72, 0x72, 0x6f, 0x72,
-	0x5f, 0x6d, 0x73, 0x67, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x65, 0x72, 0x72, 0x6f,
-	0x72, 0x4d, 0x73, 0x67, 0x22, 0x11, 0x0a, 0x0f, 0x47, 0x65, 0x74, 0x53, 0x74, 0x61, 0x74, 0x65,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x92, 0x01, 0x0a, 0x10, 0x47, 0x65, 0x74, 0x53,
-	0x74, 0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e, 0x0a, 0x02,
-	0x6f, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x02, 0x6f, 0x6b, 0x12, 0x18, 0x0a, 0x07,
-	0x76, 0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x07, 0x76,
-	0x65, 0x72, 0x73, 0x69, 0x6f, 0x6e, 0x12, 0x2c, 0x0a, 0x12, 0x63, 0x61, 0x70, 0x61, 0x63, 0x69,
-	0x74, 0x79, 0x5f, 0x75, 0x73, 0x61, 0x67, 0x65, 0x5f, 0x70, 0x63, 0x74, 0x18, 0x03, 0x20, 0x01,
-	0x28, 0x02, 0x52, 0x10, 0x63, 0x61, 0x70, 0x61, 0x63, 0x69, 0x74, 0x79, 0x55, 0x73, 0x61, 0x67,
-	0x65, 0x50, 0x63, 0x74, 0x12, 0x26, 0x0a, 0x0f, 0x70, 0x72, 0x69, 0x76, 0x61, 0x74, 0x65, 0x5f,
-	0x69, 0x70, 0x5f, 0x61, 0x64, 0x64, 0x72, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0d, 0x70,
-	0x72, 0x69, 0x76, 0x61, 0x74, 0x65, 0x49, 0x70, 0x41, 0x64, 0x64, 0x72, 0x22, 0xbb, 0x01, 0x0a,
-	0x0b, 0x43, 0x61, 0x63, 0x68, 0x65, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x12, 0x12, 0x0a, 0x04,
-	0x70, 0x61, 0x74, 0x68, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x70, 0x61, 0x74, 0x68,
-	0x12, 0x1f, 0x0a, 0x0b, 0x62, 0x75, 0x63, 0x6b, 0x65, 0x74, 0x5f, 0x6e, 0x61, 0x6d, 0x65, 0x18,
-	0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x0a, 0x62, 0x75, 0x63, 0x6b, 0x65, 0x74, 0x4e, 0x61, 0x6d,
-	0x65, 0x12, 0x16, 0x0a, 0x06, 0x72, 0x65, 0x67, 0x69, 0x6f, 0x6e, 0x18, 0x03, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x06, 0x72, 0x65, 0x67, 0x69, 0x6f, 0x6e, 0x12, 0x21, 0x0a, 0x0c, 0x65, 0x6e, 0x64,
-	0x70, 0x6f, 0x69, 0x6e, 0x74, 0x5f, 0x75, 0x72, 0x6c, 0x18, 0x04, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x0b, 0x65, 0x6e, 0x64, 0x70, 0x6f, 0x69, 0x6e, 0x74, 0x55, 0x72, 0x6c, 0x12, 0x1d, 0x0a, 0x0a,
-	0x61, 0x63, 0x63, 0x65, 0x73, 0x73, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x05, 0x20, 0x01, 0x28, 0x09,
-	0x52, 0x09, 0x61, 0x63, 0x63, 0x65, 0x73, 0x73, 0x4b, 0x65, 0x79, 0x12, 0x1d, 0x0a, 0x0a, 0x73,
-	0x65, 0x63, 0x72, 0x65, 0x74, 0x5f, 0x6b, 0x65, 0x79, 0x18, 0x06, 0x20, 0x01, 0x28, 0x09, 0x52,
-	0x09, 0x73, 0x65, 0x63, 0x72, 0x65, 0x74, 0x4b, 0x65, 0x79, 0x22, 0x4c, 0x0a, 0x1d, 0x53, 0x74,
-	0x6f, 0x72, 0x65, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x46, 0x72, 0x6f, 0x6d, 0x53, 0x6f,
-	0x75, 0x72, 0x63, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x2b, 0x0a, 0x06, 0x73,
-	0x6f, 0x75, 0x72, 0x63, 0x65, 0x18, 0x01, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x67, 0x6f,
-	0x70, 0x72, 0x6f, 0x63, 0x2e, 0x43, 0x61, 0x63, 0x68, 0x65, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65,
-	0x52, 0x06, 0x73, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x22, 0x61, 0x0a, 0x1e, 0x53, 0x74, 0x6f, 0x72,
-	0x65, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x46, 0x72, 0x6f, 0x6d, 0x53, 0x6f, 0x75, 0x72,
-	0x63, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x6f, 0x6b,
-	0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x02, 0x6f, 0x6b, 0x12, 0x12, 0x0a, 0x04, 0x68, 0x61,
-	0x73, 0x68, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x04, 0x68, 0x61, 0x73, 0x68, 0x12, 0x1b,
-	0x0a, 0x09, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x5f, 0x6d, 0x73, 0x67, 0x18, 0x03, 0x20, 0x01, 0x28,
-	0x09, 0x52, 0x08, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x4d, 0x73, 0x67, 0x22, 0x36, 0x0a, 0x18, 0x47,
-	0x65, 0x74, 0x41, 0x76, 0x61, 0x69, 0x6c, 0x61, 0x62, 0x6c, 0x65, 0x48, 0x6f, 0x73, 0x74, 0x73,
-	0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x1a, 0x0a, 0x08, 0x6c, 0x6f, 0x63, 0x61, 0x6c,
-	0x69, 0x74, 0x79, 0x18, 0x01, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x6c, 0x6f, 0x63, 0x61, 0x6c,
-	0x69, 0x74, 0x79, 0x22, 0x2b, 0x0a, 0x19, 0x47, 0x65, 0x74, 0x41, 0x76, 0x61, 0x69, 0x6c, 0x61,
-	0x62, 0x6c, 0x65, 0x48, 0x6f, 0x73, 0x74, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x12, 0x0e, 0x0a, 0x02, 0x6f, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x02, 0x6f, 0x6b,
-	0x32, 0xdb, 0x04, 0x0a, 0x06, 0x47, 0x6f, 0x50, 0x72, 0x6f, 0x63, 0x12, 0x45, 0x0a, 0x0a, 0x47,
-	0x65, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x12, 0x19, 0x2e, 0x67, 0x6f, 0x70, 0x72,
-	0x6f, 0x63, 0x2e, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x71,
-	0x75, 0x65, 0x73, 0x74, 0x1a, 0x1a, 0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x2e, 0x47, 0x65,
-	0x74, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x22, 0x00, 0x12, 0x45, 0x0a, 0x0a, 0x48, 0x61, 0x73, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74,
-	0x12, 0x19, 0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x2e, 0x48, 0x61, 0x73, 0x43, 0x6f, 0x6e,
-	0x74, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1a, 0x2e, 0x67, 0x6f,
-	0x70, 0x72, 0x6f, 0x63, 0x2e, 0x48, 0x61, 0x73, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x52,
-	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x4d, 0x0a, 0x10, 0x47, 0x65, 0x74,
-	0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x53, 0x74, 0x72, 0x65, 0x61, 0x6d, 0x12, 0x19, 0x2e,
-	0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x2e, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e,
-	0x74, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1a, 0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f,
-	0x63, 0x2e, 0x47, 0x65, 0x74, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x70,
-	0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x30, 0x01, 0x12, 0x4d, 0x0a, 0x0c, 0x53, 0x74, 0x6f, 0x72,
-	0x65, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x12, 0x1b, 0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f,
-	0x63, 0x2e, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x52, 0x65,
-	0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1c, 0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x2e, 0x53,
-	0x74, 0x6f, 0x72, 0x65, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x22, 0x00, 0x28, 0x01, 0x12, 0x69, 0x0a, 0x16, 0x53, 0x74, 0x6f, 0x72, 0x65,
-	0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x46, 0x72, 0x6f, 0x6d, 0x53, 0x6f, 0x75, 0x72, 0x63,
-	0x65, 0x12, 0x25, 0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x2e, 0x53, 0x74, 0x6f, 0x72, 0x65,
-	0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x46, 0x72, 0x6f, 0x6d, 0x53, 0x6f, 0x75, 0x72, 0x63,
-	0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x26, 0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f,
-	0x63, 0x2e, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x46, 0x72,
-	0x6f, 0x6d, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
-	0x22, 0x00, 0x12, 0x79, 0x0a, 0x1e, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x43, 0x6f, 0x6e, 0x74, 0x65,
-	0x6e, 0x74, 0x46, 0x72, 0x6f, 0x6d, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x57, 0x69, 0x74, 0x68,
-	0x4c, 0x6f, 0x63, 0x6b, 0x12, 0x25, 0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x2e, 0x53, 0x74,
-	0x6f, 0x72, 0x65, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e, 0x74, 0x46, 0x72, 0x6f, 0x6d, 0x53, 0x6f,
-	0x75, 0x72, 0x63, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x2e, 0x2e, 0x67, 0x6f,
-	0x70, 0x72, 0x6f, 0x63, 0x2e, 0x53, 0x74, 0x6f, 0x72, 0x65, 0x43, 0x6f, 0x6e, 0x74, 0x65, 0x6e,
-	0x74, 0x46, 0x72, 0x6f, 0x6d, 0x53, 0x6f, 0x75, 0x72, 0x63, 0x65, 0x57, 0x69, 0x74, 0x68, 0x4c,
-	0x6f, 0x63, 0x6b, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x3f, 0x0a,
-	0x08, 0x47, 0x65, 0x74, 0x53, 0x74, 0x61, 0x74, 0x65, 0x12, 0x17, 0x2e, 0x67, 0x6f, 0x70, 0x72,
-	0x6f, 0x63, 0x2e, 0x47, 0x65, 0x74, 0x53, 0x74, 0x61, 0x74, 0x65, 0x52, 0x65, 0x71, 0x75, 0x65,
-	0x73, 0x74, 0x1a, 0x18, 0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x2e, 0x47, 0x65, 0x74, 0x53,
-	0x74, 0x61, 0x74, 0x65, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x24,
-	0x5a, 0x22, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x62, 0x65, 0x61,
-	0x6d, 0x2d, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x2f, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x2f, 0x70,
-	0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x22, 0x14, 0x0a, 0x12, 0x45, 0x78, 0x65, 0x63, 0x50, 0x72,
+	0x6f, 0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x15, 0x0a, 0x13,
+	0x45, 0x78, 0x65, 0x63, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x32, 0x4b, 0x0a, 0x06, 0x47, 0x6f, 0x50, 0x72, 0x6f, 0x63, 0x12, 0x41, 0x0a,
+	0x04, 0x45, 0x78, 0x65, 0x63, 0x12, 0x1a, 0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x2e, 0x45,
+	0x78, 0x65, 0x63, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x1a, 0x1b, 0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x2e, 0x45, 0x78, 0x65, 0x63, 0x50,
+	0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00,
+	0x42, 0x24, 0x5a, 0x22, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x62,
+	0x65, 0x61, 0x6d, 0x2d, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x2f, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63,
+	0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -945,44 +125,19 @@ func file_goproc_proto_rawDescGZIP() []byte {
 	return file_goproc_proto_rawDescData
 }
 
-var file_goproc_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_goproc_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_goproc_proto_goTypes = []interface{}{
-	(*GetContentRequest)(nil),                      // 0: goproc.GetContentRequest
-	(*GetContentResponse)(nil),                     // 1: goproc.GetContentResponse
-	(*HasContentRequest)(nil),                      // 2: goproc.HasContentRequest
-	(*HasContentResponse)(nil),                     // 3: goproc.HasContentResponse
-	(*StoreContentRequest)(nil),                    // 4: goproc.StoreContentRequest
-	(*StoreContentResponse)(nil),                   // 5: goproc.StoreContentResponse
-	(*StoreContentFromSourceWithLockResponse)(nil), // 6: goproc.StoreContentFromSourceWithLockResponse
-	(*GetStateRequest)(nil),                        // 7: goproc.GetStateRequest
-	(*GetStateResponse)(nil),                       // 8: goproc.GetStateResponse
-	(*CacheSource)(nil),                            // 9: goproc.CacheSource
-	(*StoreContentFromSourceRequest)(nil),          // 10: goproc.StoreContentFromSourceRequest
-	(*StoreContentFromSourceResponse)(nil),         // 11: goproc.StoreContentFromSourceResponse
-	(*GetAvailableHostsRequest)(nil),               // 12: goproc.GetAvailableHostsRequest
-	(*GetAvailableHostsResponse)(nil),              // 13: goproc.GetAvailableHostsResponse
+	(*ExecProcessRequest)(nil),  // 0: goproc.ExecProcessRequest
+	(*ExecProcessResponse)(nil), // 1: goproc.ExecProcessResponse
 }
 var file_goproc_proto_depIdxs = []int32{
-	9,  // 0: goproc.StoreContentFromSourceRequest.source:type_name -> goproc.CacheSource
-	0,  // 1: goproc.GoProc.GetContent:input_type -> goproc.GetContentRequest
-	2,  // 2: goproc.GoProc.HasContent:input_type -> goproc.HasContentRequest
-	0,  // 3: goproc.GoProc.GetContentStream:input_type -> goproc.GetContentRequest
-	4,  // 4: goproc.GoProc.StoreContent:input_type -> goproc.StoreContentRequest
-	10, // 5: goproc.GoProc.StoreContentFromSource:input_type -> goproc.StoreContentFromSourceRequest
-	10, // 6: goproc.GoProc.StoreContentFromSourceWithLock:input_type -> goproc.StoreContentFromSourceRequest
-	7,  // 7: goproc.GoProc.GetState:input_type -> goproc.GetStateRequest
-	1,  // 8: goproc.GoProc.GetContent:output_type -> goproc.GetContentResponse
-	3,  // 9: goproc.GoProc.HasContent:output_type -> goproc.HasContentResponse
-	1,  // 10: goproc.GoProc.GetContentStream:output_type -> goproc.GetContentResponse
-	5,  // 11: goproc.GoProc.StoreContent:output_type -> goproc.StoreContentResponse
-	11, // 12: goproc.GoProc.StoreContentFromSource:output_type -> goproc.StoreContentFromSourceResponse
-	6,  // 13: goproc.GoProc.StoreContentFromSourceWithLock:output_type -> goproc.StoreContentFromSourceWithLockResponse
-	8,  // 14: goproc.GoProc.GetState:output_type -> goproc.GetStateResponse
-	8,  // [8:15] is the sub-list for method output_type
-	1,  // [1:8] is the sub-list for method input_type
-	1,  // [1:1] is the sub-list for extension type_name
-	1,  // [1:1] is the sub-list for extension extendee
-	0,  // [0:1] is the sub-list for field type_name
+	0, // 0: goproc.GoProc.Exec:input_type -> goproc.ExecProcessRequest
+	1, // 1: goproc.GoProc.Exec:output_type -> goproc.ExecProcessResponse
+	1, // [1:2] is the sub-list for method output_type
+	0, // [0:1] is the sub-list for method input_type
+	0, // [0:0] is the sub-list for extension type_name
+	0, // [0:0] is the sub-list for extension extendee
+	0, // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_goproc_proto_init() }
@@ -992,7 +147,7 @@ func file_goproc_proto_init() {
 	}
 	if !protoimpl.UnsafeEnabled {
 		file_goproc_proto_msgTypes[0].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetContentRequest); i {
+			switch v := v.(*ExecProcessRequest); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1004,151 +159,7 @@ func file_goproc_proto_init() {
 			}
 		}
 		file_goproc_proto_msgTypes[1].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetContentResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_goproc_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*HasContentRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_goproc_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*HasContentResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_goproc_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*StoreContentRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_goproc_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*StoreContentResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_goproc_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*StoreContentFromSourceWithLockResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_goproc_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetStateRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_goproc_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetStateResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_goproc_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*CacheSource); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_goproc_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*StoreContentFromSourceRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_goproc_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*StoreContentFromSourceResponse); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_goproc_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetAvailableHostsRequest); i {
-			case 0:
-				return &v.state
-			case 1:
-				return &v.sizeCache
-			case 2:
-				return &v.unknownFields
-			default:
-				return nil
-			}
-		}
-		file_goproc_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
-			switch v := v.(*GetAvailableHostsResponse); i {
+			switch v := v.(*ExecProcessResponse); i {
 			case 0:
 				return &v.state
 			case 1:
@@ -1166,7 +177,7 @@ func file_goproc_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_goproc_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   14,
+			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

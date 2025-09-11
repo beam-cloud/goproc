@@ -19,27 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	GoProc_GetContent_FullMethodName                     = "/goproc.GoProc/GetContent"
-	GoProc_HasContent_FullMethodName                     = "/goproc.GoProc/HasContent"
-	GoProc_GetContentStream_FullMethodName               = "/goproc.GoProc/GetContentStream"
-	GoProc_StoreContent_FullMethodName                   = "/goproc.GoProc/StoreContent"
-	GoProc_StoreContentFromSource_FullMethodName         = "/goproc.GoProc/StoreContentFromSource"
-	GoProc_StoreContentFromSourceWithLock_FullMethodName = "/goproc.GoProc/StoreContentFromSourceWithLock"
-	GoProc_GetState_FullMethodName                       = "/goproc.GoProc/GetState"
+	GoProc_Exec_FullMethodName = "/goproc.GoProc/Exec"
 )
 
 // GoProcClient is the client API for GoProc service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GoProcClient interface {
-	// Cache RPCs
-	GetContent(ctx context.Context, in *GetContentRequest, opts ...grpc.CallOption) (*GetContentResponse, error)
-	HasContent(ctx context.Context, in *HasContentRequest, opts ...grpc.CallOption) (*HasContentResponse, error)
-	GetContentStream(ctx context.Context, in *GetContentRequest, opts ...grpc.CallOption) (GoProc_GetContentStreamClient, error)
-	StoreContent(ctx context.Context, opts ...grpc.CallOption) (GoProc_StoreContentClient, error)
-	StoreContentFromSource(ctx context.Context, in *StoreContentFromSourceRequest, opts ...grpc.CallOption) (*StoreContentFromSourceResponse, error)
-	StoreContentFromSourceWithLock(ctx context.Context, in *StoreContentFromSourceRequest, opts ...grpc.CallOption) (*StoreContentFromSourceWithLockResponse, error)
-	GetState(ctx context.Context, in *GetStateRequest, opts ...grpc.CallOption) (*GetStateResponse, error)
+	Exec(ctx context.Context, in *ExecProcessRequest, opts ...grpc.CallOption) (*ExecProcessResponse, error)
 }
 
 type goProcClient struct {
@@ -50,111 +37,9 @@ func NewGoProcClient(cc grpc.ClientConnInterface) GoProcClient {
 	return &goProcClient{cc}
 }
 
-func (c *goProcClient) GetContent(ctx context.Context, in *GetContentRequest, opts ...grpc.CallOption) (*GetContentResponse, error) {
-	out := new(GetContentResponse)
-	err := c.cc.Invoke(ctx, GoProc_GetContent_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *goProcClient) HasContent(ctx context.Context, in *HasContentRequest, opts ...grpc.CallOption) (*HasContentResponse, error) {
-	out := new(HasContentResponse)
-	err := c.cc.Invoke(ctx, GoProc_HasContent_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *goProcClient) GetContentStream(ctx context.Context, in *GetContentRequest, opts ...grpc.CallOption) (GoProc_GetContentStreamClient, error) {
-	stream, err := c.cc.NewStream(ctx, &GoProc_ServiceDesc.Streams[0], GoProc_GetContentStream_FullMethodName, opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &goProcGetContentStreamClient{stream}
-	if err := x.ClientStream.SendMsg(in); err != nil {
-		return nil, err
-	}
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	return x, nil
-}
-
-type GoProc_GetContentStreamClient interface {
-	Recv() (*GetContentResponse, error)
-	grpc.ClientStream
-}
-
-type goProcGetContentStreamClient struct {
-	grpc.ClientStream
-}
-
-func (x *goProcGetContentStreamClient) Recv() (*GetContentResponse, error) {
-	m := new(GetContentResponse)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func (c *goProcClient) StoreContent(ctx context.Context, opts ...grpc.CallOption) (GoProc_StoreContentClient, error) {
-	stream, err := c.cc.NewStream(ctx, &GoProc_ServiceDesc.Streams[1], GoProc_StoreContent_FullMethodName, opts...)
-	if err != nil {
-		return nil, err
-	}
-	x := &goProcStoreContentClient{stream}
-	return x, nil
-}
-
-type GoProc_StoreContentClient interface {
-	Send(*StoreContentRequest) error
-	CloseAndRecv() (*StoreContentResponse, error)
-	grpc.ClientStream
-}
-
-type goProcStoreContentClient struct {
-	grpc.ClientStream
-}
-
-func (x *goProcStoreContentClient) Send(m *StoreContentRequest) error {
-	return x.ClientStream.SendMsg(m)
-}
-
-func (x *goProcStoreContentClient) CloseAndRecv() (*StoreContentResponse, error) {
-	if err := x.ClientStream.CloseSend(); err != nil {
-		return nil, err
-	}
-	m := new(StoreContentResponse)
-	if err := x.ClientStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func (c *goProcClient) StoreContentFromSource(ctx context.Context, in *StoreContentFromSourceRequest, opts ...grpc.CallOption) (*StoreContentFromSourceResponse, error) {
-	out := new(StoreContentFromSourceResponse)
-	err := c.cc.Invoke(ctx, GoProc_StoreContentFromSource_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *goProcClient) StoreContentFromSourceWithLock(ctx context.Context, in *StoreContentFromSourceRequest, opts ...grpc.CallOption) (*StoreContentFromSourceWithLockResponse, error) {
-	out := new(StoreContentFromSourceWithLockResponse)
-	err := c.cc.Invoke(ctx, GoProc_StoreContentFromSourceWithLock_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *goProcClient) GetState(ctx context.Context, in *GetStateRequest, opts ...grpc.CallOption) (*GetStateResponse, error) {
-	out := new(GetStateResponse)
-	err := c.cc.Invoke(ctx, GoProc_GetState_FullMethodName, in, out, opts...)
+func (c *goProcClient) Exec(ctx context.Context, in *ExecProcessRequest, opts ...grpc.CallOption) (*ExecProcessResponse, error) {
+	out := new(ExecProcessResponse)
+	err := c.cc.Invoke(ctx, GoProc_Exec_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -165,14 +50,7 @@ func (c *goProcClient) GetState(ctx context.Context, in *GetStateRequest, opts .
 // All implementations must embed UnimplementedGoProcServer
 // for forward compatibility
 type GoProcServer interface {
-	// Cache RPCs
-	GetContent(context.Context, *GetContentRequest) (*GetContentResponse, error)
-	HasContent(context.Context, *HasContentRequest) (*HasContentResponse, error)
-	GetContentStream(*GetContentRequest, GoProc_GetContentStreamServer) error
-	StoreContent(GoProc_StoreContentServer) error
-	StoreContentFromSource(context.Context, *StoreContentFromSourceRequest) (*StoreContentFromSourceResponse, error)
-	StoreContentFromSourceWithLock(context.Context, *StoreContentFromSourceRequest) (*StoreContentFromSourceWithLockResponse, error)
-	GetState(context.Context, *GetStateRequest) (*GetStateResponse, error)
+	Exec(context.Context, *ExecProcessRequest) (*ExecProcessResponse, error)
 	mustEmbedUnimplementedGoProcServer()
 }
 
@@ -180,26 +58,8 @@ type GoProcServer interface {
 type UnimplementedGoProcServer struct {
 }
 
-func (UnimplementedGoProcServer) GetContent(context.Context, *GetContentRequest) (*GetContentResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetContent not implemented")
-}
-func (UnimplementedGoProcServer) HasContent(context.Context, *HasContentRequest) (*HasContentResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method HasContent not implemented")
-}
-func (UnimplementedGoProcServer) GetContentStream(*GetContentRequest, GoProc_GetContentStreamServer) error {
-	return status.Errorf(codes.Unimplemented, "method GetContentStream not implemented")
-}
-func (UnimplementedGoProcServer) StoreContent(GoProc_StoreContentServer) error {
-	return status.Errorf(codes.Unimplemented, "method StoreContent not implemented")
-}
-func (UnimplementedGoProcServer) StoreContentFromSource(context.Context, *StoreContentFromSourceRequest) (*StoreContentFromSourceResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method StoreContentFromSource not implemented")
-}
-func (UnimplementedGoProcServer) StoreContentFromSourceWithLock(context.Context, *StoreContentFromSourceRequest) (*StoreContentFromSourceWithLockResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method StoreContentFromSourceWithLock not implemented")
-}
-func (UnimplementedGoProcServer) GetState(context.Context, *GetStateRequest) (*GetStateResponse, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetState not implemented")
+func (UnimplementedGoProcServer) Exec(context.Context, *ExecProcessRequest) (*ExecProcessResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Exec not implemented")
 }
 func (UnimplementedGoProcServer) mustEmbedUnimplementedGoProcServer() {}
 
@@ -214,139 +74,20 @@ func RegisterGoProcServer(s grpc.ServiceRegistrar, srv GoProcServer) {
 	s.RegisterService(&GoProc_ServiceDesc, srv)
 }
 
-func _GoProc_GetContent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetContentRequest)
+func _GoProc_Exec_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ExecProcessRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(GoProcServer).GetContent(ctx, in)
+		return srv.(GoProcServer).Exec(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: GoProc_GetContent_FullMethodName,
+		FullMethod: GoProc_Exec_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GoProcServer).GetContent(ctx, req.(*GetContentRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _GoProc_HasContent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(HasContentRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GoProcServer).HasContent(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: GoProc_HasContent_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GoProcServer).HasContent(ctx, req.(*HasContentRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _GoProc_GetContentStream_Handler(srv interface{}, stream grpc.ServerStream) error {
-	m := new(GetContentRequest)
-	if err := stream.RecvMsg(m); err != nil {
-		return err
-	}
-	return srv.(GoProcServer).GetContentStream(m, &goProcGetContentStreamServer{stream})
-}
-
-type GoProc_GetContentStreamServer interface {
-	Send(*GetContentResponse) error
-	grpc.ServerStream
-}
-
-type goProcGetContentStreamServer struct {
-	grpc.ServerStream
-}
-
-func (x *goProcGetContentStreamServer) Send(m *GetContentResponse) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func _GoProc_StoreContent_Handler(srv interface{}, stream grpc.ServerStream) error {
-	return srv.(GoProcServer).StoreContent(&goProcStoreContentServer{stream})
-}
-
-type GoProc_StoreContentServer interface {
-	SendAndClose(*StoreContentResponse) error
-	Recv() (*StoreContentRequest, error)
-	grpc.ServerStream
-}
-
-type goProcStoreContentServer struct {
-	grpc.ServerStream
-}
-
-func (x *goProcStoreContentServer) SendAndClose(m *StoreContentResponse) error {
-	return x.ServerStream.SendMsg(m)
-}
-
-func (x *goProcStoreContentServer) Recv() (*StoreContentRequest, error) {
-	m := new(StoreContentRequest)
-	if err := x.ServerStream.RecvMsg(m); err != nil {
-		return nil, err
-	}
-	return m, nil
-}
-
-func _GoProc_StoreContentFromSource_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(StoreContentFromSourceRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GoProcServer).StoreContentFromSource(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: GoProc_StoreContentFromSource_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GoProcServer).StoreContentFromSource(ctx, req.(*StoreContentFromSourceRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _GoProc_StoreContentFromSourceWithLock_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(StoreContentFromSourceRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GoProcServer).StoreContentFromSourceWithLock(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: GoProc_StoreContentFromSourceWithLock_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GoProcServer).StoreContentFromSourceWithLock(ctx, req.(*StoreContentFromSourceRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _GoProc_GetState_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetStateRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(GoProcServer).GetState(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: GoProc_GetState_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(GoProcServer).GetState(ctx, req.(*GetStateRequest))
+		return srv.(GoProcServer).Exec(ctx, req.(*ExecProcessRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -359,37 +100,10 @@ var GoProc_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*GoProcServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "GetContent",
-			Handler:    _GoProc_GetContent_Handler,
-		},
-		{
-			MethodName: "HasContent",
-			Handler:    _GoProc_HasContent_Handler,
-		},
-		{
-			MethodName: "StoreContentFromSource",
-			Handler:    _GoProc_StoreContentFromSource_Handler,
-		},
-		{
-			MethodName: "StoreContentFromSourceWithLock",
-			Handler:    _GoProc_StoreContentFromSourceWithLock_Handler,
-		},
-		{
-			MethodName: "GetState",
-			Handler:    _GoProc_GetState_Handler,
+			MethodName: "Exec",
+			Handler:    _GoProc_Exec_Handler,
 		},
 	},
-	Streams: []grpc.StreamDesc{
-		{
-			StreamName:    "GetContentStream",
-			Handler:       _GoProc_GetContentStream_Handler,
-			ServerStreams: true,
-		},
-		{
-			StreamName:    "StoreContent",
-			Handler:       _GoProc_StoreContent_Handler,
-			ClientStreams: true,
-		},
-	},
+	Streams:  []grpc.StreamDesc{},
 	Metadata: "goproc.proto",
 }

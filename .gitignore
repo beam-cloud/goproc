@@ -1,6 +1,6 @@
 *.tgz
 .DS_Store
-bin/basic
+bin/goproc
 build.sh
 tmp/
 .go-version
