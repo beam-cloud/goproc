@@ -25,6 +25,7 @@ func (cs *GoProcServer) StartServer(ctx context.Context, port uint) error {
 
 	localListener, err := net.Listen("tcp", addr)
 	if err != nil {
+		Logger.Errorf("Failed to listen on %s: %v", addr, err)
 		return err
 	}
 

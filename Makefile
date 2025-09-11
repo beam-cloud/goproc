@@ -11,3 +11,6 @@ protocol:
 build:
 	docker build --target build --platform=$(GOOS)/$(GOARCH) --tag localhost:5001/goproc:$(imageVersion) .
 	docker push localhost:5001/goproc:$(imageVersion)
+
+debug:
+	./bin/hotreload.sh
