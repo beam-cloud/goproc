@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"syscall"
 
+	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 )
 
@@ -25,7 +26,7 @@ func (cs *GoProcServer) StartServer(ctx context.Context, port uint) error {
 
 	localListener, err := net.Listen("tcp", addr)
 	if err != nil {
-		Logger.Errorf("Failed to listen on %s: %v", addr, err)
+		log.Error().Err(err).Msgf("Failed to listen on %s", addr)
 		return err
 	}
 
@@ -38,7 +39,7 @@ func (cs *GoProcServer) StartServer(ctx context.Context, port uint) error {
 	)
 	// proto.RegisterGoProcServer(s, cs)
 
-	Logger.Infof("Running @%s, cfg: %+v", addr, cs.cfg)
+	log.Info().Msgf("Running @%s, cfg: %+v", addr, cs.cfg)
 
 	go s.Serve(localListener)
 
@@ -47,7 +48,7 @@ func (cs *GoProcServer) StartServer(ctx context.Context, port uint) error {
 	signal.Notify(terminationChan, os.Interrupt, syscall.SIGTERM)
 
 	sig := <-terminationChan
-	Logger.Infof("Termination signal (%v) received. Shutting down server...", sig)
+	log.Info().Msgf("Termination signal (%v) received. Shutting down server...", sig)
 
 	s.GracefulStop()
 	return nil

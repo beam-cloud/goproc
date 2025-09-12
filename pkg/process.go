@@ -4,6 +4,8 @@ import (
 	"context"
 	"os"
 	"os/exec"
+
+	"github.com/rs/zerolog/log"
 )
 
 type Process struct {
@@ -20,7 +22,7 @@ func (p *Process) Exec() error {
 	cmd.Stderr = os.Stderr
 	err := cmd.Start()
 	if err != nil {
-		Logger.Errorf("Failed to execute command: %v", err)
+		log.Error().Err(err).Msg("Failed to execute command")
 	}
 
 	return nil

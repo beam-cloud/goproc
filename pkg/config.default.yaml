@@ -2,4 +2,4 @@ serverPort: 7111
 grpcDialTimeoutS: 1
 grpcMessageSizeBytes: 1000000000
 debugMode: false
-prettyLogs: false
+prettyLogs: true

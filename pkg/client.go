@@ -9,8 +9,6 @@ type GoProcClient struct {
 }
 
 func NewGoProcClient(ctx context.Context, cfg GoProcConfig) (*GoProcClient, error) {
-	InitLogger(cfg.DebugMode, cfg.PrettyLogs)
-
 	c := &GoProcClient{
 		ctx: ctx,
 	}
