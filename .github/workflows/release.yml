@@ -15,28 +15,21 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - os: linux
-            arch: amd64
-            goos: linux
+          - goos: linux
             goarch: amd64
-            image_arch: linux/amd64
             suffix: linux-amd64
-          - os: linux
-            arch: arm64
-            goos: linux
+          - goos: linux
             goarch: arm64
-            image_arch: linux/arm64
             suffix: linux-arm64
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Set up QEMU
-        uses: docker/setup-qemu-action@v3
-
-      - name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.22.10'
 
       - name: Extract version from tag
         id: vars
@@ -47,24 +40,14 @@ jobs:
           echo "tag=${TAG}" >> $GITHUB_OUTPUT
           echo "clean_tag=${CLEAN_TAG}" >> $GITHUB_OUTPUT
 
-      - name: Build binary in container (${{ matrix.suffix }})
+      - name: Build binary (${{ matrix.suffix }})
+        env:
+          CGO_ENABLED: 0
+          GOOS: ${{ matrix.goos }}
+          GOARCH: ${{ matrix.goarch }}
         run: |
-          docker buildx build \
-            --platform ${{ matrix.image_arch }} \
-            --target build \
-            --output type=local,dest=out \
-            .
-          # The Dockerfile installs the binary at /usr/local/bin/goproc in the build stage.
-          # Local exporter writes the target stage filesystem to the 'out' directory root.
-          BIN_PATH="out/usr/local/bin/goproc"
-          if [ ! -f "$BIN_PATH" ]; then
-            echo "Binary not found at $BIN_PATH" >&2
-            find out -maxdepth 6 -type f | sed 's/^/out-file: /'
-            exit 1
-          fi
           mkdir -p dist
-          cp "$BIN_PATH" "dist/goproc-${{ steps.vars.outputs.clean_tag }}-${{ matrix.suffix }}"
-          chmod +x "dist/goproc-${{ steps.vars.outputs.clean_tag }}-${{ matrix.suffix }}"
+          go build -o "dist/goproc-${{ steps.vars.outputs.clean_tag }}-${{ matrix.suffix }}" ./cmd/main.go
 
       - name: Upload asset to release (${{ matrix.suffix }})
         uses: softprops/action-gh-release@v2
