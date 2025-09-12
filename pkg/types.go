@@ -1,8 +1,7 @@
 package goproc
 
 const (
-	GoProcHostPrefix string = "goproc-host"
-	GoProcVersion    string = "dev"
+	GoProcVersion string = "dev"
 )
 
 type GoProcConfig struct {

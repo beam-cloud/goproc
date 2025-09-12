@@ -24,6 +24,11 @@ type ExecProcessRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
+
+	Args []string `protobuf:"bytes,1,rep,name=args,proto3" json:"args,omitempty"`
+	Cwd  string   `protobuf:"bytes,2,opt,name=cwd,proto3" json:"cwd,omitempty"`
+	Env  []string `protobuf:"bytes,3,rep,name=env,proto3" json:"env,omitempty"`
+	Wait *bool    `protobuf:"varint,4,opt,name=wait,proto3,oneof" json:"wait,omitempty"`
 }
 
 func (x *ExecProcessRequest) Reset() {
@@ -58,10 +63,43 @@ func (*ExecProcessRequest) Descriptor() ([]byte, []int) {
 	return file_goproc_proto_rawDescGZIP(), []int{0}
 }
 
+func (x *ExecProcessRequest) GetArgs() []string {
+	if x != nil {
+		return x.Args
+	}
+	return nil
+}
+
+func (x *ExecProcessRequest) GetCwd() string {
+	if x != nil {
+		return x.Cwd
+	}
+	return ""
+}
+
+func (x *ExecProcessRequest) GetEnv() []string {
+	if x != nil {
+		return x.Env
+	}
+	return nil
+}
+
+func (x *ExecProcessRequest) GetWait() bool {
+	if x != nil && x.Wait != nil {
+		return *x.Wait
+	}
+	return false
+}
+
 type ExecProcessResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
+
+	Ok       bool   `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
+	Pid      int32  `protobuf:"varint,2,opt,name=pid,proto3" json:"pid,omitempty"`
+	ErrorMsg string `protobuf:"bytes,3,opt,name=error_msg,json=errorMsg,proto3" json:"error_msg,omitempty"`
+	ExitCode *int32 `protobuf:"varint,4,opt,name=exit_code,json=exitCode,proto3,oneof" json:"exit_code,omitempty"`
 }
 
 func (x *ExecProcessResponse) Reset() {
@@ -96,21 +134,1031 @@ func (*ExecProcessResponse) Descriptor() ([]byte, []int) {
 	return file_goproc_proto_rawDescGZIP(), []int{1}
 }
 
+func (x *ExecProcessResponse) GetOk() bool {
+	if x != nil {
+		return x.Ok
+	}
+	return false
+}
+
+func (x *ExecProcessResponse) GetPid() int32 {
+	if x != nil {
+		return x.Pid
+	}
+	return 0
+}
+
+func (x *ExecProcessResponse) GetErrorMsg() string {
+	if x != nil {
+		return x.ErrorMsg
+	}
+	return ""
+}
+
+func (x *ExecProcessResponse) GetExitCode() int32 {
+	if x != nil && x.ExitCode != nil {
+		return *x.ExitCode
+	}
+	return 0
+}
+
+type WaitProcessRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Pid int32 `protobuf:"varint,1,opt,name=pid,proto3" json:"pid,omitempty"`
+}
+
+func (x *WaitProcessRequest) Reset() {
+	*x = WaitProcessRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_goproc_proto_msgTypes[2]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *WaitProcessRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WaitProcessRequest) ProtoMessage() {}
+
+func (x *WaitProcessRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_goproc_proto_msgTypes[2]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WaitProcessRequest.ProtoReflect.Descriptor instead.
+func (*WaitProcessRequest) Descriptor() ([]byte, []int) {
+	return file_goproc_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *WaitProcessRequest) GetPid() int32 {
+	if x != nil {
+		return x.Pid
+	}
+	return 0
+}
+
+type WaitProcessResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Ok       bool   `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
+	ExitCode int32  `protobuf:"varint,2,opt,name=exit_code,json=exitCode,proto3" json:"exit_code,omitempty"`
+	ErrorMsg string `protobuf:"bytes,3,opt,name=error_msg,json=errorMsg,proto3" json:"error_msg,omitempty"`
+}
+
+func (x *WaitProcessResponse) Reset() {
+	*x = WaitProcessResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_goproc_proto_msgTypes[3]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *WaitProcessResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*WaitProcessResponse) ProtoMessage() {}
+
+func (x *WaitProcessResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_goproc_proto_msgTypes[3]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use WaitProcessResponse.ProtoReflect.Descriptor instead.
+func (*WaitProcessResponse) Descriptor() ([]byte, []int) {
+	return file_goproc_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *WaitProcessResponse) GetOk() bool {
+	if x != nil {
+		return x.Ok
+	}
+	return false
+}
+
+func (x *WaitProcessResponse) GetExitCode() int32 {
+	if x != nil {
+		return x.ExitCode
+	}
+	return 0
+}
+
+func (x *WaitProcessResponse) GetErrorMsg() string {
+	if x != nil {
+		return x.ErrorMsg
+	}
+	return ""
+}
+
+type KillProcessRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Pid int32 `protobuf:"varint,1,opt,name=pid,proto3" json:"pid,omitempty"`
+}
+
+func (x *KillProcessRequest) Reset() {
+	*x = KillProcessRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_goproc_proto_msgTypes[4]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *KillProcessRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*KillProcessRequest) ProtoMessage() {}
+
+func (x *KillProcessRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_goproc_proto_msgTypes[4]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use KillProcessRequest.ProtoReflect.Descriptor instead.
+func (*KillProcessRequest) Descriptor() ([]byte, []int) {
+	return file_goproc_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *KillProcessRequest) GetPid() int32 {
+	if x != nil {
+		return x.Pid
+	}
+	return 0
+}
+
+type KillProcessResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Ok       bool   `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
+	ErrorMsg string `protobuf:"bytes,2,opt,name=error_msg,json=errorMsg,proto3" json:"error_msg,omitempty"`
+}
+
+func (x *KillProcessResponse) Reset() {
+	*x = KillProcessResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_goproc_proto_msgTypes[5]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *KillProcessResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*KillProcessResponse) ProtoMessage() {}
+
+func (x *KillProcessResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_goproc_proto_msgTypes[5]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use KillProcessResponse.ProtoReflect.Descriptor instead.
+func (*KillProcessResponse) Descriptor() ([]byte, []int) {
+	return file_goproc_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *KillProcessResponse) GetOk() bool {
+	if x != nil {
+		return x.Ok
+	}
+	return false
+}
+
+func (x *KillProcessResponse) GetErrorMsg() string {
+	if x != nil {
+		return x.ErrorMsg
+	}
+	return ""
+}
+
+type SignalProcessRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Pid    int32 `protobuf:"varint,1,opt,name=pid,proto3" json:"pid,omitempty"`
+	Signal int32 `protobuf:"varint,2,opt,name=signal,proto3" json:"signal,omitempty"`
+}
+
+func (x *SignalProcessRequest) Reset() {
+	*x = SignalProcessRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_goproc_proto_msgTypes[6]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SignalProcessRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SignalProcessRequest) ProtoMessage() {}
+
+func (x *SignalProcessRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_goproc_proto_msgTypes[6]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SignalProcessRequest.ProtoReflect.Descriptor instead.
+func (*SignalProcessRequest) Descriptor() ([]byte, []int) {
+	return file_goproc_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *SignalProcessRequest) GetPid() int32 {
+	if x != nil {
+		return x.Pid
+	}
+	return 0
+}
+
+func (x *SignalProcessRequest) GetSignal() int32 {
+	if x != nil {
+		return x.Signal
+	}
+	return 0
+}
+
+type SignalProcessResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Ok       bool   `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
+	ErrorMsg string `protobuf:"bytes,2,opt,name=error_msg,json=errorMsg,proto3" json:"error_msg,omitempty"`
+}
+
+func (x *SignalProcessResponse) Reset() {
+	*x = SignalProcessResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_goproc_proto_msgTypes[7]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *SignalProcessResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SignalProcessResponse) ProtoMessage() {}
+
+func (x *SignalProcessResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_goproc_proto_msgTypes[7]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SignalProcessResponse.ProtoReflect.Descriptor instead.
+func (*SignalProcessResponse) Descriptor() ([]byte, []int) {
+	return file_goproc_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *SignalProcessResponse) GetOk() bool {
+	if x != nil {
+		return x.Ok
+	}
+	return false
+}
+
+func (x *SignalProcessResponse) GetErrorMsg() string {
+	if x != nil {
+		return x.ErrorMsg
+	}
+	return ""
+}
+
+type StatusProcessRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Pid int32 `protobuf:"varint,1,opt,name=pid,proto3" json:"pid,omitempty"`
+}
+
+func (x *StatusProcessRequest) Reset() {
+	*x = StatusProcessRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_goproc_proto_msgTypes[8]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *StatusProcessRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StatusProcessRequest) ProtoMessage() {}
+
+func (x *StatusProcessRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_goproc_proto_msgTypes[8]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StatusProcessRequest.ProtoReflect.Descriptor instead.
+func (*StatusProcessRequest) Descriptor() ([]byte, []int) {
+	return file_goproc_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *StatusProcessRequest) GetPid() int32 {
+	if x != nil {
+		return x.Pid
+	}
+	return 0
+}
+
+type StatusProcessResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Ok       bool         `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
+	Process  *ProcessInfo `protobuf:"bytes,2,opt,name=process,proto3" json:"process,omitempty"`
+	ErrorMsg string       `protobuf:"bytes,3,opt,name=error_msg,json=errorMsg,proto3" json:"error_msg,omitempty"`
+}
+
+func (x *StatusProcessResponse) Reset() {
+	*x = StatusProcessResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_goproc_proto_msgTypes[9]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *StatusProcessResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StatusProcessResponse) ProtoMessage() {}
+
+func (x *StatusProcessResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_goproc_proto_msgTypes[9]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StatusProcessResponse.ProtoReflect.Descriptor instead.
+func (*StatusProcessResponse) Descriptor() ([]byte, []int) {
+	return file_goproc_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *StatusProcessResponse) GetOk() bool {
+	if x != nil {
+		return x.Ok
+	}
+	return false
+}
+
+func (x *StatusProcessResponse) GetProcess() *ProcessInfo {
+	if x != nil {
+		return x.Process
+	}
+	return nil
+}
+
+func (x *StatusProcessResponse) GetErrorMsg() string {
+	if x != nil {
+		return x.ErrorMsg
+	}
+	return ""
+}
+
+type StdoutProcessRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Pid int32 `protobuf:"varint,1,opt,name=pid,proto3" json:"pid,omitempty"`
+}
+
+func (x *StdoutProcessRequest) Reset() {
+	*x = StdoutProcessRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_goproc_proto_msgTypes[10]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *StdoutProcessRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StdoutProcessRequest) ProtoMessage() {}
+
+func (x *StdoutProcessRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_goproc_proto_msgTypes[10]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StdoutProcessRequest.ProtoReflect.Descriptor instead.
+func (*StdoutProcessRequest) Descriptor() ([]byte, []int) {
+	return file_goproc_proto_rawDescGZIP(), []int{10}
+}
+
+func (x *StdoutProcessRequest) GetPid() int32 {
+	if x != nil {
+		return x.Pid
+	}
+	return 0
+}
+
+type StdoutProcessResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Ok       bool   `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
+	ErrorMsg string `protobuf:"bytes,2,opt,name=error_msg,json=errorMsg,proto3" json:"error_msg,omitempty"`
+	Stdout   string `protobuf:"bytes,3,opt,name=stdout,proto3" json:"stdout,omitempty"`
+}
+
+func (x *StdoutProcessResponse) Reset() {
+	*x = StdoutProcessResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_goproc_proto_msgTypes[11]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *StdoutProcessResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StdoutProcessResponse) ProtoMessage() {}
+
+func (x *StdoutProcessResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_goproc_proto_msgTypes[11]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StdoutProcessResponse.ProtoReflect.Descriptor instead.
+func (*StdoutProcessResponse) Descriptor() ([]byte, []int) {
+	return file_goproc_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *StdoutProcessResponse) GetOk() bool {
+	if x != nil {
+		return x.Ok
+	}
+	return false
+}
+
+func (x *StdoutProcessResponse) GetErrorMsg() string {
+	if x != nil {
+		return x.ErrorMsg
+	}
+	return ""
+}
+
+func (x *StdoutProcessResponse) GetStdout() string {
+	if x != nil {
+		return x.Stdout
+	}
+	return ""
+}
+
+type StderrProcessRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Pid int32 `protobuf:"varint,1,opt,name=pid,proto3" json:"pid,omitempty"`
+}
+
+func (x *StderrProcessRequest) Reset() {
+	*x = StderrProcessRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_goproc_proto_msgTypes[12]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *StderrProcessRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StderrProcessRequest) ProtoMessage() {}
+
+func (x *StderrProcessRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_goproc_proto_msgTypes[12]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StderrProcessRequest.ProtoReflect.Descriptor instead.
+func (*StderrProcessRequest) Descriptor() ([]byte, []int) {
+	return file_goproc_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *StderrProcessRequest) GetPid() int32 {
+	if x != nil {
+		return x.Pid
+	}
+	return 0
+}
+
+type StderrProcessResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Ok       bool   `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
+	ErrorMsg string `protobuf:"bytes,2,opt,name=error_msg,json=errorMsg,proto3" json:"error_msg,omitempty"`
+	Stderr   string `protobuf:"bytes,3,opt,name=stderr,proto3" json:"stderr,omitempty"`
+}
+
+func (x *StderrProcessResponse) Reset() {
+	*x = StderrProcessResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_goproc_proto_msgTypes[13]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *StderrProcessResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StderrProcessResponse) ProtoMessage() {}
+
+func (x *StderrProcessResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_goproc_proto_msgTypes[13]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StderrProcessResponse.ProtoReflect.Descriptor instead.
+func (*StderrProcessResponse) Descriptor() ([]byte, []int) {
+	return file_goproc_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *StderrProcessResponse) GetOk() bool {
+	if x != nil {
+		return x.Ok
+	}
+	return false
+}
+
+func (x *StderrProcessResponse) GetErrorMsg() string {
+	if x != nil {
+		return x.ErrorMsg
+	}
+	return ""
+}
+
+func (x *StderrProcessResponse) GetStderr() string {
+	if x != nil {
+		return x.Stderr
+	}
+	return ""
+}
+
+type ListProcessesRequest struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Args []string `protobuf:"bytes,1,rep,name=args,proto3" json:"args,omitempty"`
+	Cwd  string   `protobuf:"bytes,2,opt,name=cwd,proto3" json:"cwd,omitempty"`
+	Env  []string `protobuf:"bytes,3,rep,name=env,proto3" json:"env,omitempty"`
+}
+
+func (x *ListProcessesRequest) Reset() {
+	*x = ListProcessesRequest{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_goproc_proto_msgTypes[14]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListProcessesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListProcessesRequest) ProtoMessage() {}
+
+func (x *ListProcessesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_goproc_proto_msgTypes[14]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListProcessesRequest.ProtoReflect.Descriptor instead.
+func (*ListProcessesRequest) Descriptor() ([]byte, []int) {
+	return file_goproc_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *ListProcessesRequest) GetArgs() []string {
+	if x != nil {
+		return x.Args
+	}
+	return nil
+}
+
+func (x *ListProcessesRequest) GetCwd() string {
+	if x != nil {
+		return x.Cwd
+	}
+	return ""
+}
+
+func (x *ListProcessesRequest) GetEnv() []string {
+	if x != nil {
+		return x.Env
+	}
+	return nil
+}
+
+type ProcessInfo struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Pid      int32    `protobuf:"varint,1,opt,name=pid,proto3" json:"pid,omitempty"`
+	Cmd      string   `protobuf:"bytes,2,opt,name=cmd,proto3" json:"cmd,omitempty"`
+	Cwd      string   `protobuf:"bytes,3,opt,name=cwd,proto3" json:"cwd,omitempty"`
+	Env      []string `protobuf:"bytes,4,rep,name=env,proto3" json:"env,omitempty"`
+	Running  bool     `protobuf:"varint,5,opt,name=running,proto3" json:"running,omitempty"`
+	ExitCode int32    `protobuf:"varint,6,opt,name=exit_code,json=exitCode,proto3" json:"exit_code,omitempty"`
+}
+
+func (x *ProcessInfo) Reset() {
+	*x = ProcessInfo{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_goproc_proto_msgTypes[15]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ProcessInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ProcessInfo) ProtoMessage() {}
+
+func (x *ProcessInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_goproc_proto_msgTypes[15]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ProcessInfo.ProtoReflect.Descriptor instead.
+func (*ProcessInfo) Descriptor() ([]byte, []int) {
+	return file_goproc_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *ProcessInfo) GetPid() int32 {
+	if x != nil {
+		return x.Pid
+	}
+	return 0
+}
+
+func (x *ProcessInfo) GetCmd() string {
+	if x != nil {
+		return x.Cmd
+	}
+	return ""
+}
+
+func (x *ProcessInfo) GetCwd() string {
+	if x != nil {
+		return x.Cwd
+	}
+	return ""
+}
+
+func (x *ProcessInfo) GetEnv() []string {
+	if x != nil {
+		return x.Env
+	}
+	return nil
+}
+
+func (x *ProcessInfo) GetRunning() bool {
+	if x != nil {
+		return x.Running
+	}
+	return false
+}
+
+func (x *ProcessInfo) GetExitCode() int32 {
+	if x != nil {
+		return x.ExitCode
+	}
+	return 0
+}
+
+type ListProcessesResponse struct {
+	state         protoimpl.MessageState
+	sizeCache     protoimpl.SizeCache
+	unknownFields protoimpl.UnknownFields
+
+	Ok        bool           `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
+	Processes []*ProcessInfo `protobuf:"bytes,2,rep,name=processes,proto3" json:"processes,omitempty"`
+	ErrorMsg  string         `protobuf:"bytes,3,opt,name=error_msg,json=errorMsg,proto3" json:"error_msg,omitempty"`
+}
+
+func (x *ListProcessesResponse) Reset() {
+	*x = ListProcessesResponse{}
+	if protoimpl.UnsafeEnabled {
+		mi := &file_goproc_proto_msgTypes[16]
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		ms.StoreMessageInfo(mi)
+	}
+}
+
+func (x *ListProcessesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListProcessesResponse) ProtoMessage() {}
+
+func (x *ListProcessesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_goproc_proto_msgTypes[16]
+	if protoimpl.UnsafeEnabled && x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListProcessesResponse.ProtoReflect.Descriptor instead.
+func (*ListProcessesResponse) Descriptor() ([]byte, []int) {
+	return file_goproc_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *ListProcessesResponse) GetOk() bool {
+	if x != nil {
+		return x.Ok
+	}
+	return false
+}
+
+func (x *ListProcessesResponse) GetProcesses() []*ProcessInfo {
+	if x != nil {
+		return x.Processes
+	}
+	return nil
+}
+
+func (x *ListProcessesResponse) GetErrorMsg() string {
+	if x != nil {
+		return x.ErrorMsg
+	}
+	return ""
+}
+
 var File_goproc_proto protoreflect.FileDescriptor
 
 var file_goproc_proto_rawDesc = []byte{
 	0x0a, 0x0c, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x2e, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x12, 0x06,
-	0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x22, 0x14, 0x0a, 0x12, 0x45, 0x78, 0x65, 0x63, 0x50, 0x72,
-	0x6f, 0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x22, 0x15, 0x0a, 0x13,
-	0x45, 0x78, 0x65, 0x63, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f,
-	0x6e, 0x73, 0x65, 0x32, 0x4b, 0x0a, 0x06, 0x47, 0x6f, 0x50, 0x72, 0x6f, 0x63, 0x12, 0x41, 0x0a,
-	0x04, 0x45, 0x78, 0x65, 0x63, 0x12, 0x1a, 0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x2e, 0x45,
-	0x78, 0x65, 0x63, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
-	0x74, 0x1a, 0x1b, 0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x2e, 0x45, 0x78, 0x65, 0x63, 0x50,
+	0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x22, 0x6e, 0x0a, 0x12, 0x45, 0x78, 0x65, 0x63, 0x50, 0x72,
+	0x6f, 0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x12, 0x0a, 0x04,
+	0x61, 0x72, 0x67, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52, 0x04, 0x61, 0x72, 0x67, 0x73,
+	0x12, 0x10, 0x0a, 0x03, 0x63, 0x77, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x63,
+	0x77, 0x64, 0x12, 0x10, 0x0a, 0x03, 0x65, 0x6e, 0x76, 0x18, 0x03, 0x20, 0x03, 0x28, 0x09, 0x52,
+	0x03, 0x65, 0x6e, 0x76, 0x12, 0x17, 0x0a, 0x04, 0x77, 0x61, 0x69, 0x74, 0x18, 0x04, 0x20, 0x01,
+	0x28, 0x08, 0x48, 0x00, 0x52, 0x04, 0x77, 0x61, 0x69, 0x74, 0x88, 0x01, 0x01, 0x42, 0x07, 0x0a,
+	0x05, 0x5f, 0x77, 0x61, 0x69, 0x74, 0x22, 0x84, 0x01, 0x0a, 0x13, 0x45, 0x78, 0x65, 0x63, 0x50,
+	0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e,
+	0x0a, 0x02, 0x6f, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x02, 0x6f, 0x6b, 0x12, 0x10,
+	0x0a, 0x03, 0x70, 0x69, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x03, 0x70, 0x69, 0x64,
+	0x12, 0x1b, 0x0a, 0x09, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x5f, 0x6d, 0x73, 0x67, 0x18, 0x03, 0x20,
+	0x01, 0x28, 0x09, 0x52, 0x08, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x4d, 0x73, 0x67, 0x12, 0x20, 0x0a,
+	0x09, 0x65, 0x78, 0x69, 0x74, 0x5f, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x04, 0x20, 0x01, 0x28, 0x05,
+	0x48, 0x00, 0x52, 0x08, 0x65, 0x78, 0x69, 0x74, 0x43, 0x6f, 0x64, 0x65, 0x88, 0x01, 0x01, 0x42,
+	0x0c, 0x0a, 0x0a, 0x5f, 0x65, 0x78, 0x69, 0x74, 0x5f, 0x63, 0x6f, 0x64, 0x65, 0x22, 0x26, 0x0a,
+	0x12, 0x57, 0x61, 0x69, 0x74, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x12, 0x10, 0x0a, 0x03, 0x70, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05,
+	0x52, 0x03, 0x70, 0x69, 0x64, 0x22, 0x5f, 0x0a, 0x13, 0x57, 0x61, 0x69, 0x74, 0x50, 0x72, 0x6f,
+	0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e, 0x0a, 0x02,
+	0x6f, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x02, 0x6f, 0x6b, 0x12, 0x1b, 0x0a, 0x09,
+	0x65, 0x78, 0x69, 0x74, 0x5f, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52,
+	0x08, 0x65, 0x78, 0x69, 0x74, 0x43, 0x6f, 0x64, 0x65, 0x12, 0x1b, 0x0a, 0x09, 0x65, 0x72, 0x72,
+	0x6f, 0x72, 0x5f, 0x6d, 0x73, 0x67, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x65, 0x72,
+	0x72, 0x6f, 0x72, 0x4d, 0x73, 0x67, 0x22, 0x26, 0x0a, 0x12, 0x4b, 0x69, 0x6c, 0x6c, 0x50, 0x72,
+	0x6f, 0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x10, 0x0a, 0x03,
+	0x70, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x03, 0x70, 0x69, 0x64, 0x22, 0x42,
+	0x0a, 0x13, 0x4b, 0x69, 0x6c, 0x6c, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x6f, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28,
+	0x08, 0x52, 0x02, 0x6f, 0x6b, 0x12, 0x1b, 0x0a, 0x09, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x5f, 0x6d,
+	0x73, 0x67, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x4d,
+	0x73, 0x67, 0x22, 0x40, 0x0a, 0x14, 0x53, 0x69, 0x67, 0x6e, 0x61, 0x6c, 0x50, 0x72, 0x6f, 0x63,
+	0x65, 0x73, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x10, 0x0a, 0x03, 0x70, 0x69,
+	0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x03, 0x70, 0x69, 0x64, 0x12, 0x16, 0x0a, 0x06,
+	0x73, 0x69, 0x67, 0x6e, 0x61, 0x6c, 0x18, 0x02, 0x20, 0x01, 0x28, 0x05, 0x52, 0x06, 0x73, 0x69,
+	0x67, 0x6e, 0x61, 0x6c, 0x22, 0x44, 0x0a, 0x15, 0x53, 0x69, 0x67, 0x6e, 0x61, 0x6c, 0x50, 0x72,
+	0x6f, 0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e, 0x0a,
+	0x02, 0x6f, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x02, 0x6f, 0x6b, 0x12, 0x1b, 0x0a,
+	0x09, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x5f, 0x6d, 0x73, 0x67, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09,
+	0x52, 0x08, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x4d, 0x73, 0x67, 0x22, 0x28, 0x0a, 0x14, 0x53, 0x74,
+	0x61, 0x74, 0x75, 0x73, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65,
+	0x73, 0x74, 0x12, 0x10, 0x0a, 0x03, 0x70, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52,
+	0x03, 0x70, 0x69, 0x64, 0x22, 0x73, 0x0a, 0x15, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x50, 0x72,
+	0x6f, 0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e, 0x0a,
+	0x02, 0x6f, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x02, 0x6f, 0x6b, 0x12, 0x2d, 0x0a,
+	0x07, 0x70, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x18, 0x02, 0x20, 0x01, 0x28, 0x0b, 0x32, 0x13,
+	0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x2e, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x49,
+	0x6e, 0x66, 0x6f, 0x52, 0x07, 0x70, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x12, 0x1b, 0x0a, 0x09,
+	0x65, 0x72, 0x72, 0x6f, 0x72, 0x5f, 0x6d, 0x73, 0x67, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x08, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x4d, 0x73, 0x67, 0x22, 0x28, 0x0a, 0x14, 0x53, 0x74, 0x64,
+	0x6f, 0x75, 0x74, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x12, 0x10, 0x0a, 0x03, 0x70, 0x69, 0x64, 0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x03,
+	0x70, 0x69, 0x64, 0x22, 0x5c, 0x0a, 0x15, 0x53, 0x74, 0x64, 0x6f, 0x75, 0x74, 0x50, 0x72, 0x6f,
+	0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e, 0x0a, 0x02,
+	0x6f, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x02, 0x6f, 0x6b, 0x12, 0x1b, 0x0a, 0x09,
+	0x65, 0x72, 0x72, 0x6f, 0x72, 0x5f, 0x6d, 0x73, 0x67, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52,
+	0x08, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x4d, 0x73, 0x67, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x74, 0x64,
+	0x6f, 0x75, 0x74, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x06, 0x73, 0x74, 0x64, 0x6f, 0x75,
+	0x74, 0x22, 0x28, 0x0a, 0x14, 0x53, 0x74, 0x64, 0x65, 0x72, 0x72, 0x50, 0x72, 0x6f, 0x63, 0x65,
+	0x73, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x12, 0x10, 0x0a, 0x03, 0x70, 0x69, 0x64,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x03, 0x70, 0x69, 0x64, 0x22, 0x5c, 0x0a, 0x15, 0x53,
+	0x74, 0x64, 0x65, 0x72, 0x72, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x73, 0x70,
+	0x6f, 0x6e, 0x73, 0x65, 0x12, 0x0e, 0x0a, 0x02, 0x6f, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08,
+	0x52, 0x02, 0x6f, 0x6b, 0x12, 0x1b, 0x0a, 0x09, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x5f, 0x6d, 0x73,
+	0x67, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x4d, 0x73,
+	0x67, 0x12, 0x16, 0x0a, 0x06, 0x73, 0x74, 0x64, 0x65, 0x72, 0x72, 0x18, 0x03, 0x20, 0x01, 0x28,
+	0x09, 0x52, 0x06, 0x73, 0x74, 0x64, 0x65, 0x72, 0x72, 0x22, 0x4e, 0x0a, 0x14, 0x4c, 0x69, 0x73,
+	0x74, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x65, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73,
+	0x74, 0x12, 0x12, 0x0a, 0x04, 0x61, 0x72, 0x67, 0x73, 0x18, 0x01, 0x20, 0x03, 0x28, 0x09, 0x52,
+	0x04, 0x61, 0x72, 0x67, 0x73, 0x12, 0x10, 0x0a, 0x03, 0x63, 0x77, 0x64, 0x18, 0x02, 0x20, 0x01,
+	0x28, 0x09, 0x52, 0x03, 0x63, 0x77, 0x64, 0x12, 0x10, 0x0a, 0x03, 0x65, 0x6e, 0x76, 0x18, 0x03,
+	0x20, 0x03, 0x28, 0x09, 0x52, 0x03, 0x65, 0x6e, 0x76, 0x22, 0x8c, 0x01, 0x0a, 0x0b, 0x50, 0x72,
+	0x6f, 0x63, 0x65, 0x73, 0x73, 0x49, 0x6e, 0x66, 0x6f, 0x12, 0x10, 0x0a, 0x03, 0x70, 0x69, 0x64,
+	0x18, 0x01, 0x20, 0x01, 0x28, 0x05, 0x52, 0x03, 0x70, 0x69, 0x64, 0x12, 0x10, 0x0a, 0x03, 0x63,
+	0x6d, 0x64, 0x18, 0x02, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x63, 0x6d, 0x64, 0x12, 0x10, 0x0a,
+	0x03, 0x63, 0x77, 0x64, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x03, 0x63, 0x77, 0x64, 0x12,
+	0x10, 0x0a, 0x03, 0x65, 0x6e, 0x76, 0x18, 0x04, 0x20, 0x03, 0x28, 0x09, 0x52, 0x03, 0x65, 0x6e,
+	0x76, 0x12, 0x18, 0x0a, 0x07, 0x72, 0x75, 0x6e, 0x6e, 0x69, 0x6e, 0x67, 0x18, 0x05, 0x20, 0x01,
+	0x28, 0x08, 0x52, 0x07, 0x72, 0x75, 0x6e, 0x6e, 0x69, 0x6e, 0x67, 0x12, 0x1b, 0x0a, 0x09, 0x65,
+	0x78, 0x69, 0x74, 0x5f, 0x63, 0x6f, 0x64, 0x65, 0x18, 0x06, 0x20, 0x01, 0x28, 0x05, 0x52, 0x08,
+	0x65, 0x78, 0x69, 0x74, 0x43, 0x6f, 0x64, 0x65, 0x22, 0x77, 0x0a, 0x15, 0x4c, 0x69, 0x73, 0x74,
+	0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x65, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73,
+	0x65, 0x12, 0x0e, 0x0a, 0x02, 0x6f, 0x6b, 0x18, 0x01, 0x20, 0x01, 0x28, 0x08, 0x52, 0x02, 0x6f,
+	0x6b, 0x12, 0x31, 0x0a, 0x09, 0x70, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x65, 0x73, 0x18, 0x02,
+	0x20, 0x03, 0x28, 0x0b, 0x32, 0x13, 0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x2e, 0x50, 0x72,
+	0x6f, 0x63, 0x65, 0x73, 0x73, 0x49, 0x6e, 0x66, 0x6f, 0x52, 0x09, 0x70, 0x72, 0x6f, 0x63, 0x65,
+	0x73, 0x73, 0x65, 0x73, 0x12, 0x1b, 0x0a, 0x09, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x5f, 0x6d, 0x73,
+	0x67, 0x18, 0x03, 0x20, 0x01, 0x28, 0x09, 0x52, 0x08, 0x65, 0x72, 0x72, 0x6f, 0x72, 0x4d, 0x73,
+	0x67, 0x32, 0xc5, 0x04, 0x0a, 0x06, 0x47, 0x6f, 0x50, 0x72, 0x6f, 0x63, 0x12, 0x41, 0x0a, 0x04,
+	0x45, 0x78, 0x65, 0x63, 0x12, 0x1a, 0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x2e, 0x45, 0x78,
+	0x65, 0x63, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74,
+	0x1a, 0x1b, 0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x2e, 0x45, 0x78, 0x65, 0x63, 0x50, 0x72,
+	0x6f, 0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12,
+	0x41, 0x0a, 0x04, 0x57, 0x61, 0x69, 0x74, 0x12, 0x1a, 0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63,
+	0x2e, 0x57, 0x61, 0x69, 0x74, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x71, 0x75,
+	0x65, 0x73, 0x74, 0x1a, 0x1b, 0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x2e, 0x57, 0x61, 0x69,
+	0x74, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65,
+	0x22, 0x00, 0x12, 0x41, 0x0a, 0x04, 0x4b, 0x69, 0x6c, 0x6c, 0x12, 0x1a, 0x2e, 0x67, 0x6f, 0x70,
+	0x72, 0x6f, 0x63, 0x2e, 0x4b, 0x69, 0x6c, 0x6c, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1b, 0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x2e,
+	0x4b, 0x69, 0x6c, 0x6c, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f,
+	0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x47, 0x0a, 0x06, 0x53, 0x69, 0x67, 0x6e, 0x61, 0x6c, 0x12,
+	0x1c, 0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x2e, 0x53, 0x69, 0x67, 0x6e, 0x61, 0x6c, 0x50,
+	0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1d, 0x2e,
+	0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x2e, 0x53, 0x69, 0x67, 0x6e, 0x61, 0x6c, 0x50, 0x72, 0x6f,
+	0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x47,
+	0x0a, 0x06, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x12, 0x1c, 0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f,
+	0x63, 0x2e, 0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x52,
+	0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1d, 0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x2e,
+	0x53, 0x74, 0x61, 0x74, 0x75, 0x73, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x73,
+	0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x47, 0x0a, 0x06, 0x53, 0x74, 0x64, 0x6f, 0x75,
+	0x74, 0x12, 0x1c, 0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x2e, 0x53, 0x74, 0x64, 0x6f, 0x75,
+	0x74, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a,
+	0x1d, 0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x2e, 0x53, 0x74, 0x64, 0x6f, 0x75, 0x74, 0x50,
 	0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x52, 0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00,
-	0x42, 0x24, 0x5a, 0x22, 0x67, 0x69, 0x74, 0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x62,
-	0x65, 0x61, 0x6d, 0x2d, 0x63, 0x6c, 0x6f, 0x75, 0x64, 0x2f, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63,
-	0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62, 0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
+	0x12, 0x47, 0x0a, 0x06, 0x53, 0x74, 0x64, 0x65, 0x72, 0x72, 0x12, 0x1c, 0x2e, 0x67, 0x6f, 0x70,
+	0x72, 0x6f, 0x63, 0x2e, 0x53, 0x74, 0x64, 0x65, 0x72, 0x72, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73,
+	0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1d, 0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f,
+	0x63, 0x2e, 0x53, 0x74, 0x64, 0x65, 0x72, 0x72, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x12, 0x4e, 0x0a, 0x0d, 0x4c, 0x69, 0x73,
+	0x74, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x65, 0x73, 0x12, 0x1c, 0x2e, 0x67, 0x6f, 0x70,
+	0x72, 0x6f, 0x63, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x65,
+	0x73, 0x52, 0x65, 0x71, 0x75, 0x65, 0x73, 0x74, 0x1a, 0x1d, 0x2e, 0x67, 0x6f, 0x70, 0x72, 0x6f,
+	0x63, 0x2e, 0x4c, 0x69, 0x73, 0x74, 0x50, 0x72, 0x6f, 0x63, 0x65, 0x73, 0x73, 0x65, 0x73, 0x52,
+	0x65, 0x73, 0x70, 0x6f, 0x6e, 0x73, 0x65, 0x22, 0x00, 0x42, 0x24, 0x5a, 0x22, 0x67, 0x69, 0x74,
+	0x68, 0x75, 0x62, 0x2e, 0x63, 0x6f, 0x6d, 0x2f, 0x62, 0x65, 0x61, 0x6d, 0x2d, 0x63, 0x6c, 0x6f,
+	0x75, 0x64, 0x2f, 0x67, 0x6f, 0x70, 0x72, 0x6f, 0x63, 0x2f, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x62,
+	0x06, 0x70, 0x72, 0x6f, 0x74, 0x6f, 0x33,
 }
 
 var (
@@ -125,19 +1173,50 @@ func file_goproc_proto_rawDescGZIP() []byte {
 	return file_goproc_proto_rawDescData
 }
 
-var file_goproc_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_goproc_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_goproc_proto_goTypes = []interface{}{
-	(*ExecProcessRequest)(nil),  // 0: goproc.ExecProcessRequest
-	(*ExecProcessResponse)(nil), // 1: goproc.ExecProcessResponse
+	(*ExecProcessRequest)(nil),    // 0: goproc.ExecProcessRequest
+	(*ExecProcessResponse)(nil),   // 1: goproc.ExecProcessResponse
+	(*WaitProcessRequest)(nil),    // 2: goproc.WaitProcessRequest
+	(*WaitProcessResponse)(nil),   // 3: goproc.WaitProcessResponse
+	(*KillProcessRequest)(nil),    // 4: goproc.KillProcessRequest
+	(*KillProcessResponse)(nil),   // 5: goproc.KillProcessResponse
+	(*SignalProcessRequest)(nil),  // 6: goproc.SignalProcessRequest
+	(*SignalProcessResponse)(nil), // 7: goproc.SignalProcessResponse
+	(*StatusProcessRequest)(nil),  // 8: goproc.StatusProcessRequest
+	(*StatusProcessResponse)(nil), // 9: goproc.StatusProcessResponse
+	(*StdoutProcessRequest)(nil),  // 10: goproc.StdoutProcessRequest
+	(*StdoutProcessResponse)(nil), // 11: goproc.StdoutProcessResponse
+	(*StderrProcessRequest)(nil),  // 12: goproc.StderrProcessRequest
+	(*StderrProcessResponse)(nil), // 13: goproc.StderrProcessResponse
+	(*ListProcessesRequest)(nil),  // 14: goproc.ListProcessesRequest
+	(*ProcessInfo)(nil),           // 15: goproc.ProcessInfo
+	(*ListProcessesResponse)(nil), // 16: goproc.ListProcessesResponse
 }
 var file_goproc_proto_depIdxs = []int32{
-	0, // 0: goproc.GoProc.Exec:input_type -> goproc.ExecProcessRequest
-	1, // 1: goproc.GoProc.Exec:output_type -> goproc.ExecProcessResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	15, // 0: goproc.StatusProcessResponse.process:type_name -> goproc.ProcessInfo
+	15, // 1: goproc.ListProcessesResponse.processes:type_name -> goproc.ProcessInfo
+	0,  // 2: goproc.GoProc.Exec:input_type -> goproc.ExecProcessRequest
+	2,  // 3: goproc.GoProc.Wait:input_type -> goproc.WaitProcessRequest
+	4,  // 4: goproc.GoProc.Kill:input_type -> goproc.KillProcessRequest
+	6,  // 5: goproc.GoProc.Signal:input_type -> goproc.SignalProcessRequest
+	8,  // 6: goproc.GoProc.Status:input_type -> goproc.StatusProcessRequest
+	10, // 7: goproc.GoProc.Stdout:input_type -> goproc.StdoutProcessRequest
+	12, // 8: goproc.GoProc.Stderr:input_type -> goproc.StderrProcessRequest
+	14, // 9: goproc.GoProc.ListProcesses:input_type -> goproc.ListProcessesRequest
+	1,  // 10: goproc.GoProc.Exec:output_type -> goproc.ExecProcessResponse
+	3,  // 11: goproc.GoProc.Wait:output_type -> goproc.WaitProcessResponse
+	5,  // 12: goproc.GoProc.Kill:output_type -> goproc.KillProcessResponse
+	7,  // 13: goproc.GoProc.Signal:output_type -> goproc.SignalProcessResponse
+	9,  // 14: goproc.GoProc.Status:output_type -> goproc.StatusProcessResponse
+	11, // 15: goproc.GoProc.Stdout:output_type -> goproc.StdoutProcessResponse
+	13, // 16: goproc.GoProc.Stderr:output_type -> goproc.StderrProcessResponse
+	16, // 17: goproc.GoProc.ListProcesses:output_type -> goproc.ListProcessesResponse
+	10, // [10:18] is the sub-list for method output_type
+	2,  // [2:10] is the sub-list for method input_type
+	2,  // [2:2] is the sub-list for extension type_name
+	2,  // [2:2] is the sub-list for extension extendee
+	0,  // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_goproc_proto_init() }
@@ -170,14 +1249,196 @@ func file_goproc_proto_init() {
 				return nil
 			}
 		}
+		file_goproc_proto_msgTypes[2].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*WaitProcessRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_goproc_proto_msgTypes[3].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*WaitProcessResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_goproc_proto_msgTypes[4].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*KillProcessRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_goproc_proto_msgTypes[5].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*KillProcessResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_goproc_proto_msgTypes[6].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SignalProcessRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_goproc_proto_msgTypes[7].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*SignalProcessResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_goproc_proto_msgTypes[8].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*StatusProcessRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_goproc_proto_msgTypes[9].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*StatusProcessResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_goproc_proto_msgTypes[10].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*StdoutProcessRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_goproc_proto_msgTypes[11].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*StdoutProcessResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_goproc_proto_msgTypes[12].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*StderrProcessRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_goproc_proto_msgTypes[13].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*StderrProcessResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_goproc_proto_msgTypes[14].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListProcessesRequest); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_goproc_proto_msgTypes[15].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ProcessInfo); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
+		file_goproc_proto_msgTypes[16].Exporter = func(v interface{}, i int) interface{} {
+			switch v := v.(*ListProcessesResponse); i {
+			case 0:
+				return &v.state
+			case 1:
+				return &v.sizeCache
+			case 2:
+				return &v.unknownFields
+			default:
+				return nil
+			}
+		}
 	}
+	file_goproc_proto_msgTypes[0].OneofWrappers = []interface{}{}
+	file_goproc_proto_msgTypes[1].OneofWrappers = []interface{}{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: file_goproc_proto_rawDesc,
 			NumEnums:      0,
-			NumMessages:   2,
+			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

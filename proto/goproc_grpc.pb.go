@@ -19,7 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	GoProc_Exec_FullMethodName = "/goproc.GoProc/Exec"
+	GoProc_Exec_FullMethodName          = "/goproc.GoProc/Exec"
+	GoProc_Wait_FullMethodName          = "/goproc.GoProc/Wait"
+	GoProc_Kill_FullMethodName          = "/goproc.GoProc/Kill"
+	GoProc_Signal_FullMethodName        = "/goproc.GoProc/Signal"
+	GoProc_Status_FullMethodName        = "/goproc.GoProc/Status"
+	GoProc_Stdout_FullMethodName        = "/goproc.GoProc/Stdout"
+	GoProc_Stderr_FullMethodName        = "/goproc.GoProc/Stderr"
+	GoProc_ListProcesses_FullMethodName = "/goproc.GoProc/ListProcesses"
 )
 
 // GoProcClient is the client API for GoProc service.
@@ -27,6 +34,13 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GoProcClient interface {
 	Exec(ctx context.Context, in *ExecProcessRequest, opts ...grpc.CallOption) (*ExecProcessResponse, error)
+	Wait(ctx context.Context, in *WaitProcessRequest, opts ...grpc.CallOption) (*WaitProcessResponse, error)
+	Kill(ctx context.Context, in *KillProcessRequest, opts ...grpc.CallOption) (*KillProcessResponse, error)
+	Signal(ctx context.Context, in *SignalProcessRequest, opts ...grpc.CallOption) (*SignalProcessResponse, error)
+	Status(ctx context.Context, in *StatusProcessRequest, opts ...grpc.CallOption) (*StatusProcessResponse, error)
+	Stdout(ctx context.Context, in *StdoutProcessRequest, opts ...grpc.CallOption) (*StdoutProcessResponse, error)
+	Stderr(ctx context.Context, in *StderrProcessRequest, opts ...grpc.CallOption) (*StderrProcessResponse, error)
+	ListProcesses(ctx context.Context, in *ListProcessesRequest, opts ...grpc.CallOption) (*ListProcessesResponse, error)
 }
 
 type goProcClient struct {
@@ -46,11 +60,81 @@ func (c *goProcClient) Exec(ctx context.Context, in *ExecProcessRequest, opts ..
 	return out, nil
 }
 
+func (c *goProcClient) Wait(ctx context.Context, in *WaitProcessRequest, opts ...grpc.CallOption) (*WaitProcessResponse, error) {
+	out := new(WaitProcessResponse)
+	err := c.cc.Invoke(ctx, GoProc_Wait_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *goProcClient) Kill(ctx context.Context, in *KillProcessRequest, opts ...grpc.CallOption) (*KillProcessResponse, error) {
+	out := new(KillProcessResponse)
+	err := c.cc.Invoke(ctx, GoProc_Kill_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *goProcClient) Signal(ctx context.Context, in *SignalProcessRequest, opts ...grpc.CallOption) (*SignalProcessResponse, error) {
+	out := new(SignalProcessResponse)
+	err := c.cc.Invoke(ctx, GoProc_Signal_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *goProcClient) Status(ctx context.Context, in *StatusProcessRequest, opts ...grpc.CallOption) (*StatusProcessResponse, error) {
+	out := new(StatusProcessResponse)
+	err := c.cc.Invoke(ctx, GoProc_Status_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *goProcClient) Stdout(ctx context.Context, in *StdoutProcessRequest, opts ...grpc.CallOption) (*StdoutProcessResponse, error) {
+	out := new(StdoutProcessResponse)
+	err := c.cc.Invoke(ctx, GoProc_Stdout_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *goProcClient) Stderr(ctx context.Context, in *StderrProcessRequest, opts ...grpc.CallOption) (*StderrProcessResponse, error) {
+	out := new(StderrProcessResponse)
+	err := c.cc.Invoke(ctx, GoProc_Stderr_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *goProcClient) ListProcesses(ctx context.Context, in *ListProcessesRequest, opts ...grpc.CallOption) (*ListProcessesResponse, error) {
+	out := new(ListProcessesResponse)
+	err := c.cc.Invoke(ctx, GoProc_ListProcesses_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GoProcServer is the server API for GoProc service.
 // All implementations must embed UnimplementedGoProcServer
 // for forward compatibility
 type GoProcServer interface {
 	Exec(context.Context, *ExecProcessRequest) (*ExecProcessResponse, error)
+	Wait(context.Context, *WaitProcessRequest) (*WaitProcessResponse, error)
+	Kill(context.Context, *KillProcessRequest) (*KillProcessResponse, error)
+	Signal(context.Context, *SignalProcessRequest) (*SignalProcessResponse, error)
+	Status(context.Context, *StatusProcessRequest) (*StatusProcessResponse, error)
+	Stdout(context.Context, *StdoutProcessRequest) (*StdoutProcessResponse, error)
+	Stderr(context.Context, *StderrProcessRequest) (*StderrProcessResponse, error)
+	ListProcesses(context.Context, *ListProcessesRequest) (*ListProcessesResponse, error)
 	mustEmbedUnimplementedGoProcServer()
 }
 
@@ -60,6 +144,27 @@ type UnimplementedGoProcServer struct {
 
 func (UnimplementedGoProcServer) Exec(context.Context, *ExecProcessRequest) (*ExecProcessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Exec not implemented")
+}
+func (UnimplementedGoProcServer) Wait(context.Context, *WaitProcessRequest) (*WaitProcessResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Wait not implemented")
+}
+func (UnimplementedGoProcServer) Kill(context.Context, *KillProcessRequest) (*KillProcessResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Kill not implemented")
+}
+func (UnimplementedGoProcServer) Signal(context.Context, *SignalProcessRequest) (*SignalProcessResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Signal not implemented")
+}
+func (UnimplementedGoProcServer) Status(context.Context, *StatusProcessRequest) (*StatusProcessResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Status not implemented")
+}
+func (UnimplementedGoProcServer) Stdout(context.Context, *StdoutProcessRequest) (*StdoutProcessResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Stdout not implemented")
+}
+func (UnimplementedGoProcServer) Stderr(context.Context, *StderrProcessRequest) (*StderrProcessResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Stderr not implemented")
+}
+func (UnimplementedGoProcServer) ListProcesses(context.Context, *ListProcessesRequest) (*ListProcessesResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ListProcesses not implemented")
 }
 func (UnimplementedGoProcServer) mustEmbedUnimplementedGoProcServer() {}
 
@@ -92,6 +197,132 @@ func _GoProc_Exec_Handler(srv interface{}, ctx context.Context, dec func(interfa
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GoProc_Wait_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(WaitProcessRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GoProcServer).Wait(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GoProc_Wait_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GoProcServer).Wait(ctx, req.(*WaitProcessRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GoProc_Kill_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(KillProcessRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GoProcServer).Kill(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GoProc_Kill_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GoProcServer).Kill(ctx, req.(*KillProcessRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GoProc_Signal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SignalProcessRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GoProcServer).Signal(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GoProc_Signal_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GoProcServer).Signal(ctx, req.(*SignalProcessRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GoProc_Status_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StatusProcessRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GoProcServer).Status(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GoProc_Status_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GoProcServer).Status(ctx, req.(*StatusProcessRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GoProc_Stdout_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StdoutProcessRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GoProcServer).Stdout(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GoProc_Stdout_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GoProcServer).Stdout(ctx, req.(*StdoutProcessRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GoProc_Stderr_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StderrProcessRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GoProcServer).Stderr(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GoProc_Stderr_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GoProcServer).Stderr(ctx, req.(*StderrProcessRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GoProc_ListProcesses_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListProcessesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GoProcServer).ListProcesses(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GoProc_ListProcesses_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GoProcServer).ListProcesses(ctx, req.(*ListProcessesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // GoProc_ServiceDesc is the grpc.ServiceDesc for GoProc service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -102,6 +333,34 @@ var GoProc_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Exec",
 			Handler:    _GoProc_Exec_Handler,
+		},
+		{
+			MethodName: "Wait",
+			Handler:    _GoProc_Wait_Handler,
+		},
+		{
+			MethodName: "Kill",
+			Handler:    _GoProc_Kill_Handler,
+		},
+		{
+			MethodName: "Signal",
+			Handler:    _GoProc_Signal_Handler,
+		},
+		{
+			MethodName: "Status",
+			Handler:    _GoProc_Status_Handler,
+		},
+		{
+			MethodName: "Stdout",
+			Handler:    _GoProc_Stdout_Handler,
+		},
+		{
+			MethodName: "Stderr",
+			Handler:    _GoProc_Stderr_Handler,
+		},
+		{
+			MethodName: "ListProcesses",
+			Handler:    _GoProc_ListProcesses_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

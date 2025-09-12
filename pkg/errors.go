@@ -5,5 +5,5 @@ import (
 )
 
 var (
-	ErrInvalidProcessArgs = errors.New("invalid process args")
+	ErrProcessNotFound = errors.New("process not found")
 )
