@@ -10,18 +10,20 @@ import (
 
 type GoProcClient struct {
 	ctx    context.Context
+	addr   string
 	port   uint
 	conn   *grpc.ClientConn
 	client proto.GoProcClient
 }
 
-func NewGoProcClient(ctx context.Context, port uint) (*GoProcClient, error) {
+func NewGoProcClient(ctx context.Context, addr string, port uint) (*GoProcClient, error) {
 	c := &GoProcClient{
 		ctx:  ctx,
+		addr: addr,
 		port: port,
 	}
 
-	conn, err := grpc.NewClient(fmt.Sprintf("0.0.0.0:%d", port), grpc.WithInsecure())
+	conn, err := grpc.NewClient(fmt.Sprintf("%s:%d", addr, port), grpc.WithInsecure())
 	if err != nil {
 		return nil, err
 	}
