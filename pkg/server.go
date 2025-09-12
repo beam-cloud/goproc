@@ -9,12 +9,14 @@ import (
 	"runtime"
 	"syscall"
 
+	"github.com/beam-cloud/goproc/proto"
 	"github.com/rs/zerolog/log"
 	"google.golang.org/grpc"
 )
 
 type GoProcServer struct {
 	cfg GoProcConfig
+	proto.UnimplementedGoProcServer
 }
 
 func NewGoProcServer(cfg GoProcConfig) (*GoProcServer, error) {
@@ -34,10 +36,9 @@ func (cs *GoProcServer) StartServer(ctx context.Context, port uint) error {
 	s := grpc.NewServer(
 		grpc.MaxRecvMsgSize(maxMessageSize),
 		grpc.MaxSendMsgSize(maxMessageSize),
-		// grpc.WriteBufferSize(writeBufferSizeBytes),
 		grpc.NumStreamWorkers(uint32(runtime.NumCPU())),
 	)
-	// proto.RegisterGoProcServer(s, cs)
+	proto.RegisterGoProcServer(s, cs)
 
 	log.Info().Msgf("Running @%s, cfg: %+v", addr, cs.cfg)
 
@@ -52,4 +53,8 @@ func (cs *GoProcServer) StartServer(ctx context.Context, port uint) error {
 
 	s.GracefulStop()
 	return nil
+}
+
+func (cs *GoProcServer) Exec(ctx context.Context, req *proto.ExecProcessRequest) (*proto.ExecProcessResponse, error) {
+	return &proto.ExecProcessResponse{}, nil
 }
