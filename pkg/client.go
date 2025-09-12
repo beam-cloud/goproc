@@ -99,6 +99,7 @@ func (c *GoProcClient) Status(pid int) (int, error) {
 	if err != nil {
 		return -1, err
 	}
+
 	if !resp.Ok {
 		return -1, fmt.Errorf(resp.ErrorMsg)
 	}

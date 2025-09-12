@@ -5,6 +5,7 @@ import (
 	"os"
 	"os/exec"
 	"strings"
+	"sync"
 )
 
 type Process struct {
@@ -14,10 +15,11 @@ type Process struct {
 	cmd       *exec.Cmd
 	stdoutBuf *SafeBuffer
 	stderrBuf *SafeBuffer
+	mu        sync.Mutex
 }
 
 func NewProcess(ctx context.Context) (*Process, error) {
-	return &Process{ctx: ctx, pid: -1, exitCode: -1}, nil
+	return &Process{ctx: ctx, pid: -1, exitCode: -1, mu: sync.Mutex{}}, nil
 }
 
 func (p *Process) Exec(args []string, cwd string, env []string, wait bool) (int, error) {
@@ -64,6 +66,9 @@ func (p *Process) Exec(args []string, cwd string, env []string, wait bool) (int,
 }
 
 func (p *Process) Wait() (int, error) {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
 	if p.cmd == nil {
 		return -1, ErrProcessNotFound
 	}
@@ -94,6 +99,9 @@ func (p *Process) Wait() (int, error) {
 }
 
 func (p *Process) Kill() error {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
 	if p.cmd == nil {
 		return ErrProcessNotFound
 	}
@@ -102,6 +110,9 @@ func (p *Process) Kill() error {
 }
 
 func (p *Process) Signal(sig os.Signal) error {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
 	if p.cmd == nil {
 		return ErrProcessNotFound
 	}
@@ -110,14 +121,24 @@ func (p *Process) Signal(sig os.Signal) error {
 }
 
 func (p *Process) Running() bool {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
 	if p.cmd == nil {
 		return false
+	}
+
+	if p.cmd.ProcessState == nil {
+		return true
 	}
 
 	return !p.cmd.ProcessState.Exited()
 }
 
 func (p *Process) ExitCode() int {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
 	if p.cmd == nil {
 		return -1
 	}
@@ -126,6 +147,9 @@ func (p *Process) ExitCode() int {
 }
 
 func (p *Process) Logs() string {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
 	if p.cmd == nil {
 		return ""
 	}
@@ -134,6 +158,9 @@ func (p *Process) Logs() string {
 }
 
 func (p *Process) Stdout() string {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
 	if p.cmd == nil {
 		return ""
 	}
@@ -142,6 +169,9 @@ func (p *Process) Stdout() string {
 }
 
 func (p *Process) Stderr() string {
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
 	if p.cmd == nil {
 		return ""
 	}
