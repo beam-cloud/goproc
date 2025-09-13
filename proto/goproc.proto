@@ -78,11 +78,7 @@ message StderrProcessResponse {
   string stderr = 3;
 }
 
-message ListProcessesRequest {
-  repeated string args = 1;
-  string cwd = 2;
-  repeated string env = 3;
-}
+message ListProcessesRequest {}
 
 message ProcessInfo {
   int32 pid = 1;

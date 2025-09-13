@@ -135,12 +135,8 @@ func (c *GoProcClient) Stderr(pid int) (string, error) {
 	return resp.Stderr, nil
 }
 
-func (c *GoProcClient) ListProcesses(args []string, cwd string, env []string) ([]*proto.ProcessInfo, error) {
-	resp, err := c.client.ListProcesses(c.ctx, &proto.ListProcessesRequest{
-		Args: args,
-		Cwd:  cwd,
-		Env:  env,
-	})
+func (c *GoProcClient) ListProcesses() ([]*proto.ProcessInfo, error) {
+	resp, err := c.client.ListProcesses(c.ctx, &proto.ListProcessesRequest{})
 	if err != nil {
 		return nil, err
 	}
