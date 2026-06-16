@@ -49,6 +49,32 @@ func (c *GoProcClient) Exec(args []string, cwd string, env []string, wait bool) 
 	return int(resp.Pid), nil
 }
 
+func (c *GoProcClient) StreamExec(ctx context.Context, args []string, cwd string, env []string, wait bool) (proto.GoProc_StreamExecClient, error) {
+	if ctx == nil {
+		ctx = c.ctx
+	}
+
+	stream, err := c.client.StreamExec(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := stream.Send(&proto.StreamExecRequest{
+		Message: &proto.StreamExecRequest_Exec{
+			Exec: &proto.ExecProcessRequest{
+				Args: args,
+				Cwd:  cwd,
+				Env:  env,
+				Wait: &wait,
+			},
+		},
+	}); err != nil {
+		return nil, err
+	}
+
+	return stream, nil
+}
+
 func (c *GoProcClient) Wait(pid int) (int, error) {
 	resp, err := c.client.Wait(c.ctx, &proto.WaitProcessRequest{
 		Pid: int32(pid),

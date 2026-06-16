@@ -6,6 +6,7 @@ package goproc;
 
 service GoProc {
   rpc Exec(ExecProcessRequest) returns (ExecProcessResponse) {}
+  rpc StreamExec(stream StreamExecRequest) returns (stream StreamExecResponse) {}
   rpc Wait(WaitProcessRequest) returns (WaitProcessResponse) {}
   rpc Kill(KillProcessRequest) returns (KillProcessResponse) {}
   rpc Signal(SignalProcessRequest) returns (SignalProcessResponse) {}
@@ -27,6 +28,42 @@ message ExecProcessResponse {
   int32 pid = 2;
   string error_msg = 3;
   optional int32 exit_code = 4;
+}
+
+message StreamExecRequest {
+  oneof message {
+    ExecProcessRequest exec = 1;
+    ProcessLogAck ack = 2;
+  }
+}
+
+message ProcessLogAck {
+  uint64 seq = 1;
+  bool ok = 2;
+  string error_msg = 3;
+}
+
+message StreamExecResponse {
+  oneof message {
+    ExecProcessStarted started = 1;
+    ProcessLogChunk chunk = 2;
+    ExecProcessExited exited = 3;
+  }
+}
+
+message ExecProcessStarted { int32 pid = 1; }
+
+message ProcessLogChunk {
+  int32 pid = 1;
+  string stream = 2;
+  uint64 seq = 3;
+  bytes data = 4;
+}
+
+message ExecProcessExited {
+  int32 pid = 1;
+  int32 exit_code = 2;
+  string error_msg = 3;
 }
 
 message WaitProcessRequest { int32 pid = 1; }

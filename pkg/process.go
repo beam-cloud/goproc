@@ -2,11 +2,21 @@ package goproc
 
 import (
 	"context"
+	"io"
 	"os"
 	"os/exec"
 	"strings"
 	"sync"
 )
+
+const (
+	ProcessStreamStdout = "stdout"
+	ProcessStreamStderr = "stderr"
+)
+
+type ProcessLogSink interface {
+	WriteProcessLog(stream string, data []byte) error
+}
 
 type Process struct {
 	ctx       context.Context
@@ -16,13 +26,24 @@ type Process struct {
 	stdoutBuf *SafeBuffer
 	stderrBuf *SafeBuffer
 	mu        sync.Mutex
+	waitOnce  sync.Once
+	waitDone  chan struct{}
+	waitErr   error
 }
 
 func NewProcess(ctx context.Context) (*Process, error) {
-	return &Process{ctx: ctx, pid: -1, exitCode: -1, mu: sync.Mutex{}}, nil
+	return &Process{ctx: ctx, pid: -1, exitCode: -1, mu: sync.Mutex{}, waitDone: make(chan struct{})}, nil
 }
 
 func (p *Process) Exec(args []string, cwd string, env []string, wait bool) (int, error) {
+	return p.exec(args, cwd, env, wait, nil)
+}
+
+func (p *Process) ExecWithLogSink(args []string, cwd string, env []string, wait bool, sink ProcessLogSink) (int, error) {
+	return p.exec(args, cwd, env, wait, sink)
+}
+
+func (p *Process) exec(args []string, cwd string, env []string, wait bool, sink ProcessLogSink) (int, error) {
 	cmd := exec.CommandContext(context.Background(), args[0], args[1:]...)
 	cmd.Dir = cwd
 	cmd.Env = env
@@ -32,6 +53,20 @@ func (p *Process) Exec(args []string, cwd string, env []string, wait bool) (int,
 	p.stderrBuf = &SafeBuffer{}
 	p.cmd.Stdout = p.stdoutBuf
 	p.cmd.Stderr = p.stderrBuf
+	if sink != nil {
+		p.cmd.Stdout = &processLogWriter{
+			stream: ProcessStreamStdout,
+			buffer: p.stdoutBuf,
+			sink:   sink,
+			kill:   p.killFromLogWriter,
+		}
+		p.cmd.Stderr = &processLogWriter{
+			stream: ProcessStreamStderr,
+			buffer: p.stderrBuf,
+			sink:   sink,
+			kill:   p.killFromLogWriter,
+		}
+	}
 
 	err := p.cmd.Start()
 	if err != nil {
@@ -41,61 +76,93 @@ func (p *Process) Exec(args []string, cwd string, env []string, wait bool) (int,
 	p.pid = p.cmd.Process.Pid
 
 	if wait {
-		// Wait synchronously
-		err = p.cmd.Wait()
-		if err != nil {
-			return p.pid, err
+		p.waitForExit()
+		if p.waitErr != nil {
+			return p.pid, p.waitErr
 		}
-		p.exitCode = p.cmd.ProcessState.ExitCode()
 	} else {
-		// Monitor the process in background
-		go func() {
-			err := p.cmd.Wait()
-			if err != nil {
-				p.exitCode = 1
-				return
-			}
-
-			if p.cmd.ProcessState != nil {
-				p.exitCode = p.cmd.ProcessState.ExitCode()
-			}
-		}()
+		go p.waitForExit()
 	}
 
 	return p.pid, nil
 }
 
-func (p *Process) Wait() (int, error) {
+type processLogWriter struct {
+	stream string
+	buffer io.Writer
+	sink   ProcessLogSink
+	kill   func()
+}
+
+func (w *processLogWriter) Write(p []byte) (int, error) {
+	if len(p) == 0 {
+		return 0, nil
+	}
+
+	data := append([]byte(nil), p...)
+	if err := w.sink.WriteProcessLog(w.stream, data); err != nil {
+		if w.kill != nil {
+			w.kill()
+		}
+		return 0, err
+	}
+
+	return w.buffer.Write(p)
+}
+
+func (p *Process) killFromLogWriter() {
 	p.mu.Lock()
 	defer p.mu.Unlock()
 
+	if p.cmd == nil || p.cmd.Process == nil {
+		return
+	}
+	if p.cmd.ProcessState != nil && p.cmd.ProcessState.Exited() {
+		return
+	}
+
+	_ = p.cmd.Process.Kill()
+}
+
+func (p *Process) Wait() (int, error) {
+	p.mu.Lock()
 	if p.cmd == nil {
+		p.mu.Unlock()
 		return -1, ErrProcessNotFound
 	}
+	p.mu.Unlock()
 
-	// If we already have an exit code, the process was already waited on
-	if p.exitCode != -1 {
-		return p.exitCode, nil
-	}
+	p.waitForExit()
 
-	err := p.cmd.Wait()
+	p.mu.Lock()
+	defer p.mu.Unlock()
+	return p.exitCode, p.waitErr
+}
 
-	// Set exit code if wait succeeded
-	if err == nil && p.cmd.ProcessState != nil {
-		p.exitCode = p.cmd.ProcessState.ExitCode()
-	}
+func (p *Process) waitForExit() {
+	p.waitOnce.Do(func() {
+		err := p.cmd.Wait()
 
-	// If error is "already waited", that's ok - get exit code from ProcessState
-	if err != nil && strings.Contains(err.Error(), "wait") && p.cmd.ProcessState != nil {
-		p.exitCode = p.cmd.ProcessState.ExitCode()
-		return p.exitCode, nil
-	}
+		p.mu.Lock()
+		defer p.mu.Unlock()
+		defer close(p.waitDone)
 
-	if err != nil {
-		return p.exitCode, err
-	}
+		p.waitErr = err
+		if p.cmd.ProcessState != nil {
+			p.exitCode = p.cmd.ProcessState.ExitCode()
+			return
+		}
 
-	return p.exitCode, nil
+		if err != nil {
+			if strings.Contains(err.Error(), "wait") && p.cmd.ProcessState != nil {
+				p.exitCode = p.cmd.ProcessState.ExitCode()
+				return
+			}
+			p.exitCode = 1
+		}
+	})
+
+	<-p.waitDone
 }
 
 func (p *Process) Kill() error {

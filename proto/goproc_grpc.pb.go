@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	GoProc_Exec_FullMethodName          = "/goproc.GoProc/Exec"
+	GoProc_StreamExec_FullMethodName    = "/goproc.GoProc/StreamExec"
 	GoProc_Wait_FullMethodName          = "/goproc.GoProc/Wait"
 	GoProc_Kill_FullMethodName          = "/goproc.GoProc/Kill"
 	GoProc_Signal_FullMethodName        = "/goproc.GoProc/Signal"
@@ -34,6 +35,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type GoProcClient interface {
 	Exec(ctx context.Context, in *ExecProcessRequest, opts ...grpc.CallOption) (*ExecProcessResponse, error)
+	StreamExec(ctx context.Context, opts ...grpc.CallOption) (GoProc_StreamExecClient, error)
 	Wait(ctx context.Context, in *WaitProcessRequest, opts ...grpc.CallOption) (*WaitProcessResponse, error)
 	Kill(ctx context.Context, in *KillProcessRequest, opts ...grpc.CallOption) (*KillProcessResponse, error)
 	Signal(ctx context.Context, in *SignalProcessRequest, opts ...grpc.CallOption) (*SignalProcessResponse, error)
@@ -58,6 +60,37 @@ func (c *goProcClient) Exec(ctx context.Context, in *ExecProcessRequest, opts ..
 		return nil, err
 	}
 	return out, nil
+}
+
+func (c *goProcClient) StreamExec(ctx context.Context, opts ...grpc.CallOption) (GoProc_StreamExecClient, error) {
+	stream, err := c.cc.NewStream(ctx, &GoProc_ServiceDesc.Streams[0], GoProc_StreamExec_FullMethodName, opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &goProcStreamExecClient{stream}
+	return x, nil
+}
+
+type GoProc_StreamExecClient interface {
+	Send(*StreamExecRequest) error
+	Recv() (*StreamExecResponse, error)
+	grpc.ClientStream
+}
+
+type goProcStreamExecClient struct {
+	grpc.ClientStream
+}
+
+func (x *goProcStreamExecClient) Send(m *StreamExecRequest) error {
+	return x.ClientStream.SendMsg(m)
+}
+
+func (x *goProcStreamExecClient) Recv() (*StreamExecResponse, error) {
+	m := new(StreamExecResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 func (c *goProcClient) Wait(ctx context.Context, in *WaitProcessRequest, opts ...grpc.CallOption) (*WaitProcessResponse, error) {
@@ -128,6 +161,7 @@ func (c *goProcClient) ListProcesses(ctx context.Context, in *ListProcessesReque
 // for forward compatibility
 type GoProcServer interface {
 	Exec(context.Context, *ExecProcessRequest) (*ExecProcessResponse, error)
+	StreamExec(GoProc_StreamExecServer) error
 	Wait(context.Context, *WaitProcessRequest) (*WaitProcessResponse, error)
 	Kill(context.Context, *KillProcessRequest) (*KillProcessResponse, error)
 	Signal(context.Context, *SignalProcessRequest) (*SignalProcessResponse, error)
@@ -144,6 +178,9 @@ type UnimplementedGoProcServer struct {
 
 func (UnimplementedGoProcServer) Exec(context.Context, *ExecProcessRequest) (*ExecProcessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Exec not implemented")
+}
+func (UnimplementedGoProcServer) StreamExec(GoProc_StreamExecServer) error {
+	return status.Errorf(codes.Unimplemented, "method StreamExec not implemented")
 }
 func (UnimplementedGoProcServer) Wait(context.Context, *WaitProcessRequest) (*WaitProcessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Wait not implemented")
@@ -195,6 +232,32 @@ func _GoProc_Exec_Handler(srv interface{}, ctx context.Context, dec func(interfa
 		return srv.(GoProcServer).Exec(ctx, req.(*ExecProcessRequest))
 	}
 	return interceptor(ctx, in, info, handler)
+}
+
+func _GoProc_StreamExec_Handler(srv interface{}, stream grpc.ServerStream) error {
+	return srv.(GoProcServer).StreamExec(&goProcStreamExecServer{stream})
+}
+
+type GoProc_StreamExecServer interface {
+	Send(*StreamExecResponse) error
+	Recv() (*StreamExecRequest, error)
+	grpc.ServerStream
+}
+
+type goProcStreamExecServer struct {
+	grpc.ServerStream
+}
+
+func (x *goProcStreamExecServer) Send(m *StreamExecResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
+func (x *goProcStreamExecServer) Recv() (*StreamExecRequest, error) {
+	m := new(StreamExecRequest)
+	if err := x.ServerStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
 }
 
 func _GoProc_Wait_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -363,6 +426,13 @@ var GoProc_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _GoProc_ListProcesses_Handler,
 		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "StreamExec",
+			Handler:       _GoProc_StreamExec_Handler,
+			ServerStreams: true,
+			ClientStreams: true,
+		},
+	},
 	Metadata: "goproc.proto",
 }
