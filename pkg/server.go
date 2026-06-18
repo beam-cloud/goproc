@@ -109,7 +109,10 @@ func (cs *GoProcServer) StartServer(ctx context.Context, port uint) error {
 		case err := <-watchdogDone:
 			stopWatch()
 			_ = localListener.Close()
-			s.Stop()
+			// After gVisor restore the old listener can be unreachable without
+			// waking grpc's accept loop. Do not call Stop here; rebind a fresh
+			// listener and let the stale server goroutine die if the runtime
+			// eventually unblocks it.
 
 			if ctx.Err() != nil {
 				return ctx.Err()
