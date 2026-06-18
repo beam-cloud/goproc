@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/signal"
 	"runtime"
+	"strconv"
 	"sync"
 	"sync/atomic"
 	"syscall"
@@ -19,7 +20,12 @@ import (
 	"google.golang.org/grpc"
 )
 
-const processLogAckTimeout = 30 * time.Second
+const (
+	processLogAckTimeout       = 30 * time.Second
+	listenerWatchdogInterval   = 2 * time.Second
+	listenerWatchdogTimeout    = 200 * time.Millisecond
+	listenerWatchdogMaxFailure = 2
+)
 
 type GoProcServer struct {
 	cfg GoProcConfig
@@ -32,35 +38,133 @@ func NewGoProcServer(cfg GoProcConfig) (*GoProcServer, error) {
 }
 
 func (cs *GoProcServer) StartServer(ctx context.Context, port uint) error {
-	addr := fmt.Sprintf(":%d", port)
-
-	localListener, err := net.Listen("tcp", addr)
-	if err != nil {
-		log.Error().Err(err).Msgf("Failed to listen on %s", addr)
-		return err
+	if ctx == nil {
+		ctx = context.Background()
 	}
 
-	maxMessageSize := cs.cfg.GRPCMessageSizeBytes
-	s := grpc.NewServer(
-		grpc.MaxRecvMsgSize(maxMessageSize),
-		grpc.MaxSendMsgSize(maxMessageSize),
-		grpc.NumStreamWorkers(uint32(runtime.NumCPU())),
-	)
-	proto.RegisterGoProcServer(s, cs)
+	addr := fmt.Sprintf(":%d", port)
 
-	log.Info().Msgf("Running @%s, cfg: %+v", addr, cs.cfg)
-
-	go s.Serve(localListener)
-
-	// Block until a termination signal is received
 	terminationChan := make(chan os.Signal, 1)
 	signal.Notify(terminationChan, os.Interrupt, syscall.SIGTERM)
+	defer signal.Stop(terminationChan)
 
-	sig := <-terminationChan
-	log.Info().Msgf("Termination signal (%v) received. Shutting down server...", sig)
+	for {
+		if err := ctx.Err(); err != nil {
+			return err
+		}
 
-	s.GracefulStop()
-	return nil
+		localListener, err := net.Listen("tcp", addr)
+		if err != nil {
+			log.Error().Err(err).Msgf("Failed to listen on %s", addr)
+			return err
+		}
+
+		maxMessageSize := cs.cfg.GRPCMessageSizeBytes
+		s := grpc.NewServer(
+			grpc.MaxRecvMsgSize(maxMessageSize),
+			grpc.MaxSendMsgSize(maxMessageSize),
+			grpc.NumStreamWorkers(uint32(runtime.NumCPU())),
+		)
+		proto.RegisterGoProcServer(s, cs)
+
+		log.Info().Msgf("Running @%s, cfg: %+v", addr, cs.cfg)
+
+		serveDone := make(chan error, 1)
+		go func() {
+			serveDone <- s.Serve(localListener)
+		}()
+
+		watchCtx, stopWatch := context.WithCancel(ctx)
+		watchdogDone := cs.watchListener(watchCtx, port)
+
+		select {
+		case <-ctx.Done():
+			stopWatch()
+			s.GracefulStop()
+			return ctx.Err()
+		case sig := <-terminationChan:
+			log.Info().Msgf("Termination signal (%v) received. Shutting down server...", sig)
+			stopWatch()
+			s.GracefulStop()
+			return nil
+		case err := <-serveDone:
+			stopWatch()
+			_ = localListener.Close()
+			s.Stop()
+
+			if ctx.Err() != nil {
+				return ctx.Err()
+			}
+			if err != nil {
+				log.Warn().Err(err).Msg("gRPC server stopped unexpectedly; restarting")
+			} else {
+				log.Warn().Msg("gRPC server stopped unexpectedly; restarting")
+			}
+
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			case <-time.After(100 * time.Millisecond):
+			}
+		case err := <-watchdogDone:
+			stopWatch()
+			_ = localListener.Close()
+			s.Stop()
+
+			if ctx.Err() != nil {
+				return ctx.Err()
+			}
+			log.Warn().Err(err).Msg("gRPC listener health check failed; restarting")
+
+			select {
+			case <-ctx.Done():
+				return ctx.Err()
+			case <-time.After(100 * time.Millisecond):
+			}
+		}
+	}
+}
+
+func (cs *GoProcServer) watchListener(ctx context.Context, port uint) <-chan error {
+	address := net.JoinHostPort("127.0.0.1", strconv.FormatUint(uint64(port), 10))
+	return watchTCPListener(ctx, address, listenerWatchdogInterval, listenerWatchdogTimeout, listenerWatchdogMaxFailure)
+}
+
+func watchTCPListener(ctx context.Context, address string, interval, timeout time.Duration, maxFailures int) <-chan error {
+	done := make(chan error, 1)
+
+	go func() {
+		ticker := time.NewTicker(interval)
+		defer ticker.Stop()
+
+		failures := 0
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				conn, err := net.DialTimeout("tcp", address, listenerWatchdogTimeout)
+				if err == nil {
+					_ = conn.Close()
+					failures = 0
+					continue
+				}
+
+				failures++
+				if failures < maxFailures {
+					continue
+				}
+
+				select {
+				case done <- err:
+				case <-ctx.Done():
+				}
+				return
+			}
+		}
+	}()
+
+	return done
 }
 
 func (cs *GoProcServer) Exec(ctx context.Context, req *proto.ExecProcessRequest) (*proto.ExecProcessResponse, error) {

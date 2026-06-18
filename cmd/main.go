@@ -27,5 +27,7 @@ func main() {
 		log.Fatal().Err(err).Msg("Failed to create GoProc server")
 	}
 
-	s.StartServer(ctx, cfg.ServerPort)
+	if err := s.StartServer(ctx, cfg.ServerPort); err != nil {
+		log.Fatal().Err(err).Msg("GoProc server stopped")
+	}
 }

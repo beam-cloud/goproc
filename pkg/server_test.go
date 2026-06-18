@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"io"
+	"net"
 	"testing"
 	"time"
 
@@ -76,6 +77,49 @@ func TestReady(t *testing.T) {
 	}
 	if !resp.Ok {
 		t.Fatal("expected ready response")
+	}
+}
+
+func TestWatchTCPListenerReportsConsecutiveFailures(t *testing.T) {
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	acceptDone := make(chan struct{})
+	go func() {
+		defer close(acceptDone)
+		for {
+			conn, err := listener.Accept()
+			if err != nil {
+				return
+			}
+			_ = conn.Close()
+		}
+	}()
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	done := watchTCPListener(ctx, listener.Addr().String(), 10*time.Millisecond, 10*time.Millisecond, 2)
+	select {
+	case err := <-done:
+		t.Fatalf("watchdog failed while listener was healthy: %v", err)
+	case <-time.After(40 * time.Millisecond):
+	}
+
+	if err := listener.Close(); err != nil {
+		t.Fatal(err)
+	}
+	<-acceptDone
+
+	select {
+	case err := <-done:
+		if err == nil {
+			t.Fatal("expected listener failure")
+		}
+	case <-time.After(time.Second):
+		t.Fatal("timed out waiting for listener failure")
 	}
 }
 

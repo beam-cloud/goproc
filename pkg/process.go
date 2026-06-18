@@ -47,6 +47,7 @@ func (p *Process) exec(args []string, cwd string, env []string, wait bool, sink 
 	cmd := exec.CommandContext(context.Background(), args[0], args[1:]...)
 	cmd.Dir = cwd
 	cmd.Env = env
+	configureCommandProcessGroup(cmd)
 
 	p.cmd = cmd
 	p.stdoutBuf = &SafeBuffer{}
@@ -121,7 +122,7 @@ func (p *Process) killFromLogWriter() {
 		return
 	}
 
-	_ = p.cmd.Process.Kill()
+	_ = killProcessTree(p.cmd.Process)
 }
 
 func (p *Process) Wait() (int, error) {
@@ -173,7 +174,7 @@ func (p *Process) Kill() error {
 		return ErrProcessNotFound
 	}
 
-	return p.cmd.Process.Kill()
+	return killProcessTree(p.cmd.Process)
 }
 
 func (p *Process) Signal(sig os.Signal) error {
@@ -184,7 +185,7 @@ func (p *Process) Signal(sig os.Signal) error {
 		return ErrProcessNotFound
 	}
 
-	return p.cmd.Process.Signal(sig)
+	return signalProcessTree(p.cmd.Process, sig)
 }
 
 func (p *Process) Running() bool {
