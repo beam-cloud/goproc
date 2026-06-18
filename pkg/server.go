@@ -24,7 +24,10 @@ const (
 	processLogAckTimeout       = 30 * time.Second
 	listenerWatchdogInterval   = 2 * time.Second
 	listenerWatchdogTimeout    = 200 * time.Millisecond
+	listenerWatchdogFirstRetry = 50 * time.Millisecond
 	listenerWatchdogMaxFailure = 2
+	// SIGWINCH is ignored by default, so workers can send it safely to older goproc builds.
+	listenerRestartSignal = syscall.SIGWINCH
 )
 
 type GoProcServer struct {
@@ -47,6 +50,10 @@ func (cs *GoProcServer) StartServer(ctx context.Context, port uint) error {
 	terminationChan := make(chan os.Signal, 1)
 	signal.Notify(terminationChan, os.Interrupt, syscall.SIGTERM)
 	defer signal.Stop(terminationChan)
+
+	restartChan := make(chan os.Signal, 1)
+	signal.Notify(restartChan, listenerRestartSignal)
+	defer signal.Stop(restartChan)
 
 	for {
 		if err := ctx.Err(); err != nil {
@@ -87,6 +94,14 @@ func (cs *GoProcServer) StartServer(ctx context.Context, port uint) error {
 			stopWatch()
 			s.GracefulStop()
 			return nil
+		case <-restartChan:
+			stopWatch()
+			_ = localListener.Close()
+
+			if ctx.Err() != nil {
+				return ctx.Err()
+			}
+			log.Info().Msg("Listener restart signal received. Rebinding server...")
 		case err := <-serveDone:
 			stopWatch()
 			_ = localListener.Close()
@@ -130,39 +145,87 @@ func (cs *GoProcServer) StartServer(ctx context.Context, port uint) error {
 
 func (cs *GoProcServer) watchListener(ctx context.Context, port uint) <-chan error {
 	address := net.JoinHostPort("127.0.0.1", strconv.FormatUint(uint64(port), 10))
-	return watchTCPListener(ctx, address, listenerWatchdogInterval, listenerWatchdogTimeout, listenerWatchdogMaxFailure)
+	return watchTCPListener(ctx, address, listenerWatchdogInterval, listenerWatchdogFirstRetry, listenerWatchdogTimeout, listenerWatchdogMaxFailure)
 }
 
-func watchTCPListener(ctx context.Context, address string, interval, timeout time.Duration, maxFailures int) <-chan error {
+func watchTCPListener(ctx context.Context, address string, interval, firstRetry, timeout time.Duration, maxFailures int) <-chan error {
 	done := make(chan error, 1)
 
 	go func() {
+		if maxFailures < 1 {
+			maxFailures = 1
+		}
+
 		ticker := time.NewTicker(interval)
 		defer ticker.Stop()
 
 		failures := 0
+		var retryTimer *time.Timer
+		var retry <-chan time.Time
+
+		stopRetry := func() {
+			if retryTimer == nil {
+				return
+			}
+			if !retryTimer.Stop() {
+				select {
+				case <-retryTimer.C:
+				default:
+				}
+			}
+			retryTimer = nil
+			retry = nil
+		}
+		defer stopRetry()
+
+		scheduleRetry := func() {
+			if retryTimer != nil {
+				return
+			}
+			retryTimer = time.NewTimer(firstRetry)
+			retry = retryTimer.C
+		}
+
+		probe := func() bool {
+			conn, err := net.DialTimeout("tcp", address, timeout)
+			if err == nil {
+				_ = conn.Close()
+				failures = 0
+				stopRetry()
+				return false
+			}
+
+			failures++
+			if failures < maxFailures {
+				scheduleRetry()
+				return false
+			}
+
+			select {
+			case done <- err:
+			case <-ctx.Done():
+			}
+			return true
+		}
+
+		if probe() {
+			return
+		}
+
 		for {
 			select {
 			case <-ctx.Done():
 				return
+			case <-retry:
+				retryTimer = nil
+				retry = nil
+				if probe() {
+					return
+				}
 			case <-ticker.C:
-				conn, err := net.DialTimeout("tcp", address, listenerWatchdogTimeout)
-				if err == nil {
-					_ = conn.Close()
-					failures = 0
-					continue
+				if probe() {
+					return
 				}
-
-				failures++
-				if failures < maxFailures {
-					continue
-				}
-
-				select {
-				case done <- err:
-				case <-ctx.Done():
-				}
-				return
 			}
 		}
 	}()

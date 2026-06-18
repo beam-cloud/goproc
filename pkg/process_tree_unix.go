@@ -3,6 +3,7 @@
 package goproc
 
 import (
+	"errors"
 	"os"
 	"os/exec"
 	"syscall"
@@ -16,10 +17,13 @@ func killProcessTree(process *os.Process) error {
 	if process == nil {
 		return ErrProcessNotFound
 	}
-	if err := syscall.Kill(-process.Pid, syscall.SIGKILL); err != syscall.ESRCH {
+	if err := syscall.Kill(-process.Pid, syscall.SIGKILL); err != nil && err != syscall.ESRCH {
 		return err
 	}
-	return process.Kill()
+	if err := process.Kill(); err != nil && !errors.Is(err, os.ErrProcessDone) {
+		return err
+	}
+	return nil
 }
 
 func signalProcessTree(process *os.Process, sig os.Signal) error {

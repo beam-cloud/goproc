@@ -7,11 +7,13 @@ import (
 	"os/exec"
 	"strings"
 	"sync"
+	"time"
 )
 
 const (
 	ProcessStreamStdout = "stdout"
 	ProcessStreamStderr = "stderr"
+	processWaitDelay    = 100 * time.Millisecond
 )
 
 type ProcessLogSink interface {
@@ -23,16 +25,26 @@ type Process struct {
 	pid       int
 	exitCode  int
 	cmd       *exec.Cmd
+	cancel    context.CancelFunc
 	stdoutBuf *SafeBuffer
 	stderrBuf *SafeBuffer
 	mu        sync.Mutex
 	waitOnce  sync.Once
 	waitDone  chan struct{}
 	waitErr   error
+	started   chan struct{}
+	startOnce sync.Once
 }
 
 func NewProcess(ctx context.Context) (*Process, error) {
-	return &Process{ctx: ctx, pid: -1, exitCode: -1, mu: sync.Mutex{}, waitDone: make(chan struct{})}, nil
+	return &Process{
+		ctx:      ctx,
+		pid:      -1,
+		exitCode: -1,
+		mu:       sync.Mutex{},
+		waitDone: make(chan struct{}),
+		started:  make(chan struct{}),
+	}, nil
 }
 
 func (p *Process) Exec(args []string, cwd string, env []string, wait bool) (int, error) {
@@ -44,12 +56,23 @@ func (p *Process) ExecWithLogSink(args []string, cwd string, env []string, wait 
 }
 
 func (p *Process) exec(args []string, cwd string, env []string, wait bool, sink ProcessLogSink) (int, error) {
-	cmd := exec.CommandContext(context.Background(), args[0], args[1:]...)
+	baseCtx := p.ctx
+	if baseCtx == nil {
+		baseCtx = context.Background()
+	}
+	cmdCtx, cancel := context.WithCancel(baseCtx)
+
+	cmd := exec.CommandContext(cmdCtx, args[0], args[1:]...)
 	cmd.Dir = cwd
 	cmd.Env = env
 	configureCommandProcessGroup(cmd)
+	cmd.Cancel = func() error {
+		return killProcessTree(cmd.Process)
+	}
+	cmd.WaitDelay = processWaitDelay
 
 	p.cmd = cmd
+	p.cancel = cancel
 	p.stdoutBuf = &SafeBuffer{}
 	p.stderrBuf = &SafeBuffer{}
 	p.cmd.Stdout = p.stdoutBuf
@@ -75,6 +98,7 @@ func (p *Process) exec(args []string, cwd string, env []string, wait bool, sink 
 	}
 
 	p.pid = p.cmd.Process.Pid
+	p.markStarted()
 
 	if wait {
 		p.waitForExit()
@@ -86,6 +110,12 @@ func (p *Process) exec(args []string, cwd string, env []string, wait bool, sink 
 	}
 
 	return p.pid, nil
+}
+
+func (p *Process) markStarted() {
+	p.startOnce.Do(func() {
+		close(p.started)
+	})
 }
 
 type processLogWriter struct {
@@ -113,6 +143,15 @@ func (w *processLogWriter) Write(p []byte) (int, error) {
 
 func (p *Process) killFromLogWriter() {
 	p.mu.Lock()
+	cancel := p.cancel
+	p.mu.Unlock()
+	if cancel != nil {
+		cancel()
+	}
+
+	p.waitStarted()
+
+	p.mu.Lock()
 	defer p.mu.Unlock()
 
 	if p.cmd == nil || p.cmd.Process == nil {
@@ -123,6 +162,17 @@ func (p *Process) killFromLogWriter() {
 	}
 
 	_ = killProcessTree(p.cmd.Process)
+}
+
+func (p *Process) waitStarted() {
+	if p.started == nil {
+		return
+	}
+
+	select {
+	case <-p.started:
+	case <-time.After(time.Second):
+	}
 }
 
 func (p *Process) Wait() (int, error) {

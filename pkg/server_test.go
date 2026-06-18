@@ -101,7 +101,7 @@ func TestWatchTCPListenerReportsConsecutiveFailures(t *testing.T) {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	done := watchTCPListener(ctx, listener.Addr().String(), 10*time.Millisecond, 10*time.Millisecond, 2)
+	done := watchTCPListener(ctx, listener.Addr().String(), 10*time.Millisecond, 5*time.Millisecond, 10*time.Millisecond, 2)
 	select {
 	case err := <-done:
 		t.Fatalf("watchdog failed while listener was healthy: %v", err)
@@ -120,6 +120,30 @@ func TestWatchTCPListenerReportsConsecutiveFailures(t *testing.T) {
 		}
 	case <-time.After(time.Second):
 		t.Fatal("timed out waiting for listener failure")
+	}
+}
+
+func TestWatchTCPListenerReportsInitialFailuresWithoutWaitingForInterval(t *testing.T) {
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	address := listener.Addr().String()
+	if err := listener.Close(); err != nil {
+		t.Fatal(err)
+	}
+
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	done := watchTCPListener(ctx, address, time.Hour, 5*time.Millisecond, 10*time.Millisecond, 2)
+	select {
+	case err := <-done:
+		if err == nil {
+			t.Fatal("expected listener failure")
+		}
+	case <-time.After(100 * time.Millisecond):
+		t.Fatal("watchdog waited for periodic interval before reporting initial failures")
 	}
 }
 
