@@ -234,17 +234,22 @@ func watchTCPListener(ctx context.Context, address string, interval, firstRetry,
 }
 
 func (cs *GoProcServer) Exec(ctx context.Context, req *proto.ExecProcessRequest) (*proto.ExecProcessResponse, error) {
-	proc, err := NewProcess(ctx)
+	wait := false
+	if req.Wait != nil {
+		wait = *req.Wait
+	}
+
+	processCtx := context.Background()
+	if wait {
+		processCtx = ctx
+	}
+
+	proc, err := NewProcess(processCtx)
 	if err != nil {
 		return &proto.ExecProcessResponse{
 			Ok:       false,
 			ErrorMsg: err.Error(),
 		}, nil
-	}
-
-	wait := false
-	if req.Wait != nil {
-		wait = *req.Wait
 	}
 
 	pid, err := proc.Exec(req.Args, req.Cwd, req.Env, wait)
@@ -283,7 +288,7 @@ func (cs *GoProcServer) StreamExec(stream proto.GoProc_StreamExecServer) error {
 		})
 	}
 
-	proc, err := NewProcess(stream.Context())
+	proc, err := NewProcess(context.Background())
 	if err != nil {
 		return stream.Send(&proto.StreamExecResponse{
 			Message: &proto.StreamExecResponse_Exited{

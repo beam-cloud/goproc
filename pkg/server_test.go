@@ -80,6 +80,73 @@ func TestReady(t *testing.T) {
 	}
 }
 
+func TestExecDetachedProcessOutlivesRPCContext(t *testing.T) {
+	server := &GoProcServer{}
+	ctx, cancel := context.WithCancel(context.Background())
+
+	wait := false
+	resp, err := server.Exec(ctx, &proto.ExecProcessRequest{
+		Args: []string{"sh", "-c", "sleep 5"},
+		Cwd:  "/",
+		Wait: &wait,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !resp.Ok {
+		t.Fatalf("exec failed: %s", resp.ErrorMsg)
+	}
+	cancel()
+	time.Sleep(100 * time.Millisecond)
+
+	proc, err := server.getProcess(resp.Pid)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !proc.Running() {
+		t.Fatal("detached process was killed when RPC context was canceled")
+	}
+	if err := proc.Kill(); err != nil {
+		t.Fatal(err)
+	}
+}
+
+func TestExecWaitProcessUsesRPCContext(t *testing.T) {
+	server := &GoProcServer{}
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+
+	wait := true
+	done := make(chan *proto.ExecProcessResponse, 1)
+	errCh := make(chan error, 1)
+	go func() {
+		resp, err := server.Exec(ctx, &proto.ExecProcessRequest{
+			Args: []string{"sh", "-c", "sleep 5"},
+			Cwd:  "/",
+			Wait: &wait,
+		})
+		if err != nil {
+			errCh <- err
+			return
+		}
+		done <- resp
+	}()
+
+	time.Sleep(100 * time.Millisecond)
+	cancel()
+
+	select {
+	case err := <-errCh:
+		t.Fatal(err)
+	case resp := <-done:
+		if resp.Ok {
+			t.Fatal("expected canceled wait exec to fail")
+		}
+	case <-time.After(time.Second):
+		t.Fatal("timed out waiting for wait exec cancellation")
+	}
+}
+
 func TestWatchTCPListenerReportsConsecutiveFailures(t *testing.T) {
 	listener, err := net.Listen("tcp", "127.0.0.1:0")
 	if err != nil {
