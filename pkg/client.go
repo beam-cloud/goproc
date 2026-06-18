@@ -161,6 +161,22 @@ func (c *GoProcClient) Stderr(pid int) (string, error) {
 	return resp.Stderr, nil
 }
 
+func (c *GoProcClient) Ready() error {
+	return c.ReadyContext(c.ctx)
+}
+
+func (c *GoProcClient) ReadyContext(ctx context.Context) error {
+	resp, err := c.client.Ready(ctx, &proto.ReadyRequest{})
+	if err != nil {
+		return err
+	}
+	if !resp.Ok {
+		return fmt.Errorf(resp.ErrorMsg)
+	}
+
+	return nil
+}
+
 func (c *GoProcClient) ListProcesses() ([]*proto.ProcessInfo, error) {
 	resp, err := c.client.ListProcesses(c.ctx, &proto.ListProcessesRequest{})
 	if err != nil {

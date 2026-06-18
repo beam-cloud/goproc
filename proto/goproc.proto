@@ -13,6 +13,7 @@ service GoProc {
   rpc Status(StatusProcessRequest) returns (StatusProcessResponse) {}
   rpc Stdout(StdoutProcessRequest) returns (StdoutProcessResponse) {}
   rpc Stderr(StderrProcessRequest) returns (StderrProcessResponse) {}
+  rpc Ready(ReadyRequest) returns (ReadyResponse) {}
   rpc ListProcesses(ListProcessesRequest) returns (ListProcessesResponse) {}
 }
 
@@ -116,6 +117,13 @@ message StderrProcessResponse {
 }
 
 message ListProcessesRequest {}
+
+message ReadyRequest {}
+
+message ReadyResponse {
+  bool ok = 1;
+  string error_msg = 2;
+}
 
 message ProcessInfo {
   int32 pid = 1;

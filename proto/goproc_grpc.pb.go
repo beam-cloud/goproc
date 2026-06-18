@@ -27,6 +27,7 @@ const (
 	GoProc_Status_FullMethodName        = "/goproc.GoProc/Status"
 	GoProc_Stdout_FullMethodName        = "/goproc.GoProc/Stdout"
 	GoProc_Stderr_FullMethodName        = "/goproc.GoProc/Stderr"
+	GoProc_Ready_FullMethodName         = "/goproc.GoProc/Ready"
 	GoProc_ListProcesses_FullMethodName = "/goproc.GoProc/ListProcesses"
 )
 
@@ -42,6 +43,7 @@ type GoProcClient interface {
 	Status(ctx context.Context, in *StatusProcessRequest, opts ...grpc.CallOption) (*StatusProcessResponse, error)
 	Stdout(ctx context.Context, in *StdoutProcessRequest, opts ...grpc.CallOption) (*StdoutProcessResponse, error)
 	Stderr(ctx context.Context, in *StderrProcessRequest, opts ...grpc.CallOption) (*StderrProcessResponse, error)
+	Ready(ctx context.Context, in *ReadyRequest, opts ...grpc.CallOption) (*ReadyResponse, error)
 	ListProcesses(ctx context.Context, in *ListProcessesRequest, opts ...grpc.CallOption) (*ListProcessesResponse, error)
 }
 
@@ -147,6 +149,15 @@ func (c *goProcClient) Stderr(ctx context.Context, in *StderrProcessRequest, opt
 	return out, nil
 }
 
+func (c *goProcClient) Ready(ctx context.Context, in *ReadyRequest, opts ...grpc.CallOption) (*ReadyResponse, error) {
+	out := new(ReadyResponse)
+	err := c.cc.Invoke(ctx, GoProc_Ready_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *goProcClient) ListProcesses(ctx context.Context, in *ListProcessesRequest, opts ...grpc.CallOption) (*ListProcessesResponse, error) {
 	out := new(ListProcessesResponse)
 	err := c.cc.Invoke(ctx, GoProc_ListProcesses_FullMethodName, in, out, opts...)
@@ -168,6 +179,7 @@ type GoProcServer interface {
 	Status(context.Context, *StatusProcessRequest) (*StatusProcessResponse, error)
 	Stdout(context.Context, *StdoutProcessRequest) (*StdoutProcessResponse, error)
 	Stderr(context.Context, *StderrProcessRequest) (*StderrProcessResponse, error)
+	Ready(context.Context, *ReadyRequest) (*ReadyResponse, error)
 	ListProcesses(context.Context, *ListProcessesRequest) (*ListProcessesResponse, error)
 	mustEmbedUnimplementedGoProcServer()
 }
@@ -199,6 +211,9 @@ func (UnimplementedGoProcServer) Stdout(context.Context, *StdoutProcessRequest) 
 }
 func (UnimplementedGoProcServer) Stderr(context.Context, *StderrProcessRequest) (*StderrProcessResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Stderr not implemented")
+}
+func (UnimplementedGoProcServer) Ready(context.Context, *ReadyRequest) (*ReadyResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Ready not implemented")
 }
 func (UnimplementedGoProcServer) ListProcesses(context.Context, *ListProcessesRequest) (*ListProcessesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method ListProcesses not implemented")
@@ -368,6 +383,24 @@ func _GoProc_Stderr_Handler(srv interface{}, ctx context.Context, dec func(inter
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GoProc_Ready_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReadyRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GoProcServer).Ready(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GoProc_Ready_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GoProcServer).Ready(ctx, req.(*ReadyRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _GoProc_ListProcesses_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(ListProcessesRequest)
 	if err := dec(in); err != nil {
@@ -420,6 +453,10 @@ var GoProc_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Stderr",
 			Handler:    _GoProc_Stderr_Handler,
+		},
+		{
+			MethodName: "Ready",
+			Handler:    _GoProc_Ready_Handler,
 		},
 		{
 			MethodName: "ListProcesses",

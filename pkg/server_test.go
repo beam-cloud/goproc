@@ -69,6 +69,65 @@ func TestStreamExecWaitRequestSendsStartedBeforeOutputAck(t *testing.T) {
 	}
 }
 
+func TestReady(t *testing.T) {
+	resp, err := (&GoProcServer{}).Ready(context.Background(), &proto.ReadyRequest{})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !resp.Ok {
+		t.Fatal("expected ready response")
+	}
+}
+
+func TestStreamExecCancelAfterStartDoesNotKillProcess(t *testing.T) {
+	server := &GoProcServer{}
+	stream := newFakeStreamExecServerStream()
+
+	wait := false
+	stream.recv <- &proto.StreamExecRequest{
+		Message: &proto.StreamExecRequest_Exec{
+			Exec: &proto.ExecProcessRequest{
+				Args: []string{"sh", "-c", "sleep 5"},
+				Cwd:  "/",
+				Wait: &wait,
+			},
+		},
+	}
+
+	errCh := make(chan error, 1)
+	go func() {
+		errCh <- server.StreamExec(stream)
+	}()
+
+	started := recvStreamExecResponse(t, stream).GetStarted()
+	if started == nil || started.Pid <= 0 {
+		t.Fatalf("expected started event with pid, got %#v", started)
+	}
+
+	stream.cancel()
+	time.Sleep(100 * time.Millisecond)
+
+	proc, err := server.getProcess(started.Pid)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !proc.Running() {
+		t.Fatal("process was killed when stream was canceled")
+	}
+	if err := proc.Kill(); err != nil {
+		t.Fatal(err)
+	}
+
+	select {
+	case err := <-errCh:
+		if err != nil {
+			t.Fatal(err)
+		}
+	case <-time.After(time.Second):
+		t.Fatal("timed out waiting for stream exec to return after explicit kill")
+	}
+}
+
 func recvStreamExecResponse(t *testing.T, stream *fakeStreamExecServerStream) *proto.StreamExecResponse {
 	t.Helper()
 

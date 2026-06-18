@@ -153,11 +153,6 @@ func (cs *GoProcServer) StreamExec(stream proto.GoProc_StreamExecServer) error {
 	}
 	session.markStarted()
 
-	go func() {
-		<-session.done
-		proc.killFromLogWriter()
-	}()
-
 	exitCode, waitErr := proc.Wait()
 	if session.err() != nil {
 		return nil
@@ -464,6 +459,10 @@ func (cs *GoProcServer) Stderr(ctx context.Context, req *proto.StderrProcessRequ
 		ErrorMsg: "",
 		Stderr:   proc.Stderr(),
 	}, nil
+}
+
+func (cs *GoProcServer) Ready(ctx context.Context, req *proto.ReadyRequest) (*proto.ReadyResponse, error) {
+	return &proto.ReadyResponse{Ok: true}, nil
 }
 
 func (cs *GoProcServer) ListProcesses(ctx context.Context, req *proto.ListProcessesRequest) (*proto.ListProcessesResponse, error) {
