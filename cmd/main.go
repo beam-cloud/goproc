@@ -10,13 +10,12 @@ import (
 )
 
 func main() {
-	configManager, err := goproc.NewConfigManager[goproc.GoProcConfig]()
+	cfg, err := goproc.LoadGoProcConfig()
 	if err != nil {
 		log.Fatal().Err(err).Msg("Failed to load config")
 	}
 
 	ctx := context.Background()
-	cfg := configManager.GetConfig()
 	if cfg.PrettyLogs {
 		log.Logger = log.Logger.Level(zerolog.DebugLevel)
 		log.Logger = log.Output(zerolog.ConsoleWriter{Out: os.Stdout})

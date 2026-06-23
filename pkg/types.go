@@ -11,3 +11,13 @@ type GoProcConfig struct {
 	DebugMode            bool `key:"debugMode" json:"debug_mode"`
 	PrettyLogs           bool `key:"prettyLogs" json:"pretty_logs"`
 }
+
+func DefaultGoProcConfig() GoProcConfig {
+	return GoProcConfig{
+		ServerPort:           7111,
+		GRPCDialTimeoutS:     1,
+		GRPCMessageSizeBytes: 1000000000,
+		DebugMode:            false,
+		PrettyLogs:           true,
+	}
+}

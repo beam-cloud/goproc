@@ -81,6 +81,18 @@ func NewConfigManager[T any]() (*ConfigManager[T], error) {
 	return cm, nil
 }
 
+func LoadGoProcConfig() (GoProcConfig, error) {
+	if os.Getenv("CONFIG_PATH") == "" && os.Getenv("CONFIG_JSON") == "" {
+		return DefaultGoProcConfig(), nil
+	}
+
+	configManager, err := NewConfigManager[GoProcConfig]()
+	if err != nil {
+		return GoProcConfig{}, err
+	}
+	return configManager.GetConfig(), nil
+}
+
 // Print returns a string representation of the current configuration state.
 func (cm *ConfigManager[T]) Print() string {
 	return cm.kf.Sprint()
