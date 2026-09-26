@@ -33,6 +33,6 @@ require (
 	github.com/mitchellh/mapstructure v1.5.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/rs/zerolog v1.34.0
-	golang.org/x/sys v0.29.0 // indirect
+	golang.org/x/sys v0.29.0
 	gopkg.in/yaml.v3 v3.0.1 // indirect
 )
