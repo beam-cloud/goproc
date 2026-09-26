@@ -55,6 +55,13 @@ func (cs *GoProcServer) StartServer(ctx context.Context, port uint) error {
 	signal.Notify(restartChan, listenerRestartSignal)
 	defer signal.Stop(restartChan)
 
+	reaperCtx, stopReaper := context.WithCancel(ctx)
+	defer stopReaper()
+	go reapOrphans(reaperCtx, func(pid int) bool {
+		_, ok := cs.processMap.Load(pid)
+		return ok
+	})
+
 	for {
 		if err := ctx.Err(); err != nil {
 			return err
