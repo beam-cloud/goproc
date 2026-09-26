@@ -92,6 +92,7 @@ func (p *Process) exec(args []string, cwd string, env []string, wait bool, sink 
 		}
 	}
 
+	preloadExecutable(p.cmd)
 	err := p.cmd.Start()
 	if err != nil {
 		return -1, err
