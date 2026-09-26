@@ -9,29 +9,23 @@ import (
 	"path/filepath"
 )
 
-const maxInterpreterDepth = 4
-
-// preloadExecutable reads what execve reads before it releases the parent:
-// the head of the binary and of each interpreter it names. Go starts
-// processes with CLONE_VFORK and the suspended thread keeps its P, so a
-// stop-the-world that begins while a lazily loaded binary is still being
-// read stalls every goroutine until that read completes.
+// Go forks with CLONE_VFORK: the parent thread stays blocked until the child's
+// execve has read the binary, and a GC stop-the-world in that window stalls
+// every goroutine. Read what execve reads (the binary and its interpreters)
+// before Start, so a lazily loaded binary only delays its own process.
 func preloadExecutable(cmd *exec.Cmd) {
-	if cmd.Err != nil {
-		return
-	}
 	path := cmd.Path
 	if !filepath.IsAbs(path) {
 		path = filepath.Join(cmd.Dir, path)
 	}
-	for i := 0; i < maxInterpreterDepth && path != ""; i++ {
-		path = readExecutableHead(path)
+	for depth := 0; path != "" && depth < 4; depth++ {
+		path = interpreterOf(path)
 	}
 }
 
-// readExecutableHead reads the start of path and returns the interpreter it
-// names: a script's #! program or an ELF binary's PT_INTERP loader.
-func readExecutableHead(path string) string {
+// interpreterOf returns the program a script's #! line or an ELF binary's
+// PT_INTERP names, or "".
+func interpreterOf(path string) string {
 	f, err := os.Open(path)
 	if err != nil {
 		return ""
@@ -48,19 +42,15 @@ func readExecutableHead(path string) string {
 		return ""
 	}
 
-	binary, err := elf.NewFile(f)
+	bin, err := elf.NewFile(f)
 	if err != nil {
 		return ""
 	}
-	for _, prog := range binary.Progs {
-		if prog.Type != elf.PT_INTERP {
-			continue
+	for _, p := range bin.Progs {
+		if p.Type == elf.PT_INTERP {
+			name, _ := io.ReadAll(p.Open())
+			return string(bytes.TrimRight(name, "\x00"))
 		}
-		name, err := io.ReadAll(prog.Open())
-		if err != nil {
-			return ""
-		}
-		return string(bytes.TrimRight(name, "\x00"))
 	}
 	return ""
 }
