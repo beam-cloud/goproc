@@ -2,10 +2,10 @@ package goproc
 
 import (
 	"context"
+	"errors"
 	"io"
 	"os"
 	"os/exec"
-	"strings"
 	"sync"
 	"time"
 )
@@ -93,7 +93,7 @@ func (p *Process) exec(args []string, cwd string, env []string, wait bool, sink 
 	}
 
 	preloadExecutable(p.cmd)
-	err := p.cmd.Start()
+	err := p.start()
 	if err != nil {
 		return -1, err
 	}
@@ -200,16 +200,16 @@ func (p *Process) waitForExit() {
 		defer close(p.waitDone)
 
 		p.waitErr = err
+		var exitErr *exec.ExitError
+		if errors.As(err, &exitErr) {
+			p.waitErr = nil
+		}
 		if p.cmd.ProcessState != nil {
-			p.exitCode = p.cmd.ProcessState.ExitCode()
+			p.exitCode = processExitCode(p.cmd.ProcessState)
 			return
 		}
 
 		if err != nil {
-			if strings.Contains(err.Error(), "wait") && p.cmd.ProcessState != nil {
-				p.exitCode = p.cmd.ProcessState.ExitCode()
-				return
-			}
 			p.exitCode = 1
 		}
 	})
@@ -247,11 +247,12 @@ func (p *Process) Running() bool {
 		return false
 	}
 
-	if p.cmd.ProcessState == nil {
+	select {
+	case <-p.waitDone:
+		return false
+	default:
 		return true
 	}
-
-	return !p.cmd.ProcessState.Exited()
 }
 
 func (p *Process) ExitCode() int {

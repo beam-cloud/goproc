@@ -13,6 +13,13 @@ func configureCommandProcessGroup(cmd *exec.Cmd) {
 	cmd.SysProcAttr = &syscall.SysProcAttr{Setpgid: true}
 }
 
+func processExitCode(state *os.ProcessState) int {
+	if status, ok := state.Sys().(syscall.WaitStatus); ok && status.Signaled() {
+		return 128 + int(status.Signal())
+	}
+	return state.ExitCode()
+}
+
 func killProcessTree(process *os.Process) error {
 	if process == nil {
 		return ErrProcessNotFound

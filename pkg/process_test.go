@@ -13,6 +13,37 @@ type logChunk struct {
 	data   []byte
 }
 
+func TestProcessFailureReturnsCompletedStatus(t *testing.T) {
+	for _, tc := range []struct {
+		name     string
+		command  string
+		exitCode int
+	}{
+		{name: "exit", command: "printf out; printf err >&2; exit 7", exitCode: 7},
+		{name: "signal", command: "printf out; printf err >&2; kill -KILL $$", exitCode: 137},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			proc, err := NewProcess(context.Background())
+			if err != nil {
+				t.Fatal(err)
+			}
+			if _, err := proc.Exec([]string{"sh", "-c", tc.command}, "/", nil, false); err != nil {
+				t.Fatal(err)
+			}
+			code, err := proc.Wait()
+			if err != nil || code != tc.exitCode {
+				t.Fatalf("Wait() = %d, %v; want %d, nil", code, err, tc.exitCode)
+			}
+			if proc.Running() || proc.ExitCode() != tc.exitCode {
+				t.Fatalf("process did not retain completed status %d", tc.exitCode)
+			}
+			if proc.Stdout() != "out" || proc.Stderr() != "err" {
+				t.Fatal("process output was not retained")
+			}
+		})
+	}
+}
+
 type blockingLogSink struct {
 	chunks   chan logChunk
 	acks     chan struct{}
