@@ -103,6 +103,9 @@ func (p *Process) exec(args []string, cwd string, env []string, wait bool, sink 
 
 	if wait {
 		p.waitForExit()
+		if err := p.ctx.Err(); err != nil {
+			return p.pid, err
+		}
 		if p.waitErr != nil {
 			return p.pid, p.waitErr
 		}
