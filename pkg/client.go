@@ -23,7 +23,8 @@ func NewGoProcClient(ctx context.Context, addr string, port uint) (*GoProcClient
 		port: port,
 	}
 
-	conn, err := grpc.NewClient(fmt.Sprintf("%s:%d", addr, port), grpc.WithInsecure())
+	conn, err := grpc.NewClient(fmt.Sprintf("%s:%d", addr, port), grpc.WithInsecure(),
+		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(16<<20)))
 	if err != nil {
 		return nil, err
 	}
