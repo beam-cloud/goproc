@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"os/exec"
 	"testing"
 	"time"
 )
@@ -179,10 +180,60 @@ func TestExecWithLogSinkTerminatesProcessOnLogFailure(t *testing.T) {
 
 	select {
 	case <-done:
-	case <-time.After(2 * time.Second):
-		t.Fatal("process did not terminate after log failure")
+	case <-time.After(processWaitDelay + time.Second):
+		t.Fatal("process did not terminate after log failure within the drain bound")
 	}
 	if stdout := proc.Stdout(); stdout != "" {
 		t.Fatalf("stdout was exposed after log failure: %q", stdout)
+	}
+}
+
+// Reproduces the lost-output failure when a 100 ms wait deadline races a
+// temporarily descheduled output copier on fractional-CPU VMs.
+func TestOutputDrainSurvivesMoreThanOneCPUQuotaPeriod(t *testing.T) {
+	sink := newBlockingLogSink()
+	proc, err := NewProcess(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := proc.ExecWithLogSink([]string{"sh", "-c", "printf retained-output"}, "/", nil, false, sink); err != nil {
+		t.Fatal(err)
+	}
+	select {
+	case <-sink.chunks:
+	case <-time.After(time.Second):
+		t.Fatal("no output chunk")
+	}
+	time.Sleep(250 * time.Millisecond)
+	sink.acks <- struct{}{}
+	code, err := proc.Wait()
+	if err != nil || code != 0 {
+		t.Fatalf("Wait()=%d,%v; output drain must survive a delayed copier", code, err)
+	}
+	if got := proc.Stdout(); got != "retained-output" {
+		t.Fatalf("stdout=%q", got)
+	}
+}
+
+func TestOutputDrainFailureCannotReportStatusSuccess(t *testing.T) {
+	proc, err := NewProcess(context.Background())
+	if err != nil {
+		t.Fatal(err)
+	}
+	cmd := exec.Command("sh", "-c", "sleep 0.2 & printf owned-output")
+	cmd.WaitDelay = 10 * time.Millisecond
+	proc.cmd = cmd
+	proc.stdoutBuf = &SafeBuffer{}
+	proc.stderrBuf = &SafeBuffer{}
+	cmd.Stdout, cmd.Stderr = proc.stdoutBuf, proc.stderrBuf
+	if err := cmd.Start(); err != nil {
+		t.Fatal(err)
+	}
+	code, err := proc.Wait()
+	if !errors.Is(err, exec.ErrWaitDelay) {
+		t.Fatalf("Wait error=%v; want ErrWaitDelay", err)
+	}
+	if code != 1 || proc.ExitCode() != 1 || proc.Running() {
+		t.Fatalf("failed drain reported success: code=%d status=%d running=%v", code, proc.ExitCode(), proc.Running())
 	}
 }
