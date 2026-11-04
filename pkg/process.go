@@ -13,7 +13,9 @@ import (
 const (
 	ProcessStreamStdout = "stdout"
 	ProcessStreamStderr = "stderr"
-	processWaitDelay    = 100 * time.Millisecond
+	// A fractional CPU may not schedule the output copier within one quota
+	// period. Retain a bounded drain deadline without truncating normal output.
+	processWaitDelay = 2 * time.Second
 )
 
 type ProcessLogSink interface {
@@ -161,8 +163,13 @@ func (p *Process) killFromLogWriter() {
 	if p.cmd == nil || p.cmd.Process == nil {
 		return
 	}
-	if p.cmd.ProcessState != nil && p.cmd.ProcessState.Exited() {
+	// Wait also drains inherited pipes. A reaped child may still have live
+	// descendants holding those pipes, so stop the group until drain ends.
+	// ProcessState is written by Cmd.Wait without holding p.mu.
+	select {
+	case <-p.waitDone:
 		return
+	default:
 	}
 
 	_ = killProcessTree(p.cmd.Process)
@@ -209,6 +216,11 @@ func (p *Process) waitForExit() {
 		}
 		if p.cmd.ProcessState != nil {
 			p.exitCode = processExitCode(p.cmd.ProcessState)
+			// A successful child exit does not make failed output collection a
+			// success. Status and Wait must agree when the drain deadline expires.
+			if p.exitCode == 0 && p.waitErr != nil {
+				p.exitCode = 1
+			}
 			return
 		}
 
