@@ -10,6 +10,11 @@ type GoProcConfig struct {
 	GRPCMessageSizeBytes int  `key:"grpcMessageSizeBytes" json:"grpc_message_size_bytes"`
 	DebugMode            bool `key:"debugMode" json:"debug_mode"`
 	PrettyLogs           bool `key:"prettyLogs" json:"pretty_logs"`
+
+	// ServerSocket is the path of a Unix socket to listen on instead of
+	// ServerPort, so that the manager takes no port of the machine it runs
+	// in. GOPROC_SOCKET sets it.
+	ServerSocket string `key:"serverSocket" json:"server_socket"`
 }
 
 func DefaultGoProcConfig() GoProcConfig {

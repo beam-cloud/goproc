@@ -82,15 +82,21 @@ func NewConfigManager[T any]() (*ConfigManager[T], error) {
 }
 
 func LoadGoProcConfig() (GoProcConfig, error) {
-	if os.Getenv("CONFIG_PATH") == "" && os.Getenv("CONFIG_JSON") == "" {
-		return DefaultGoProcConfig(), nil
+	cfg := DefaultGoProcConfig()
+	if os.Getenv("CONFIG_PATH") != "" || os.Getenv("CONFIG_JSON") != "" {
+		configManager, err := NewConfigManager[GoProcConfig]()
+		if err != nil {
+			return GoProcConfig{}, err
+		}
+		cfg = configManager.GetConfig()
 	}
 
-	configManager, err := NewConfigManager[GoProcConfig]()
-	if err != nil {
-		return GoProcConfig{}, err
+	// Whoever starts the manager chooses where it listens, as it chooses the
+	// cgroup of the processes the manager starts (GOPROC_WORKLOAD_CGROUP).
+	if socket := os.Getenv("GOPROC_SOCKET"); socket != "" {
+		cfg.ServerSocket = socket
 	}
-	return configManager.GetConfig(), nil
+	return cfg, nil
 }
 
 // Print returns a string representation of the current configuration state.
