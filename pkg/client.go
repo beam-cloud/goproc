@@ -3,6 +3,7 @@ package goproc
 import (
 	"context"
 	"fmt"
+	"net"
 
 	"github.com/beam-cloud/goproc/proto"
 	"google.golang.org/grpc"
@@ -31,6 +32,19 @@ func NewGoProcClient(ctx context.Context, addr string, port uint) (*GoProcClient
 	c.conn = conn
 	c.client = proto.NewGoProcClient(conn)
 	return c, nil
+}
+
+// NewGoProcClientWithDialer connects to a server that has no TCP address,
+// such as one that listens on a Unix socket, over the connections dial opens.
+func NewGoProcClientWithDialer(ctx context.Context, dial func(context.Context) (net.Conn, error)) (*GoProcClient, error) {
+	conn, err := grpc.NewClient("passthrough:///goproc", grpc.WithInsecure(),
+		grpc.WithContextDialer(func(ctx context.Context, _ string) (net.Conn, error) { return dial(ctx) }),
+		grpc.WithDefaultCallOptions(grpc.MaxCallRecvMsgSize(16<<20)))
+	if err != nil {
+		return nil, err
+	}
+
+	return &GoProcClient{ctx: ctx, conn: conn, client: proto.NewGoProcClient(conn)}, nil
 }
 
 func (c *GoProcClient) Exec(args []string, cwd string, env []string, wait bool) (int, error) {

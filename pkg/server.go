@@ -45,7 +45,12 @@ func (cs *GoProcServer) StartServer(ctx context.Context, port uint) error {
 		ctx = context.Background()
 	}
 
-	addr := fmt.Sprintf(":%d", port)
+	// A socket takes the place of the port.
+	network, addr := "tcp", fmt.Sprintf(":%d", port)
+	probe := net.JoinHostPort("127.0.0.1", strconv.FormatUint(uint64(port), 10))
+	if cs.cfg.ServerSocket != "" {
+		network, addr, probe = "unix", cs.cfg.ServerSocket, cs.cfg.ServerSocket
+	}
 
 	terminationChan := make(chan os.Signal, 1)
 	signal.Notify(terminationChan, os.Interrupt, syscall.SIGTERM)
@@ -67,7 +72,7 @@ func (cs *GoProcServer) StartServer(ctx context.Context, port uint) error {
 			return err
 		}
 
-		localListener, err := net.Listen("tcp", addr)
+		localListener, err := listen(network, addr)
 		if err != nil {
 			log.Error().Err(err).Msgf("Failed to listen on %s", addr)
 			return err
@@ -89,7 +94,7 @@ func (cs *GoProcServer) StartServer(ctx context.Context, port uint) error {
 		}()
 
 		watchCtx, stopWatch := context.WithCancel(ctx)
-		watchdogDone := cs.watchListener(watchCtx, port)
+		watchdogDone := watchListener(watchCtx, network, probe, listenerWatchdogInterval, listenerWatchdogFirstRetry, listenerWatchdogTimeout, listenerWatchdogMaxFailure)
 
 		select {
 		case <-ctx.Done():
@@ -150,12 +155,35 @@ func (cs *GoProcServer) StartServer(ctx context.Context, port uint) error {
 	}
 }
 
-func (cs *GoProcServer) watchListener(ctx context.Context, port uint) <-chan error {
-	address := net.JoinHostPort("127.0.0.1", strconv.FormatUint(uint64(port), 10))
-	return watchTCPListener(ctx, address, listenerWatchdogInterval, listenerWatchdogFirstRetry, listenerWatchdogTimeout, listenerWatchdogMaxFailure)
+// listen opens the server's listener. A socket left by a manager that was
+// killed is replaced, and only the socket's owner can connect to it.
+func listen(network, addr string) (net.Listener, error) {
+	if network != "unix" {
+		return net.Listen(network, addr)
+	}
+
+	if err := os.Remove(addr); err != nil && !os.IsNotExist(err) {
+		return nil, err
+	}
+
+	listener, err := net.Listen(network, addr)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := os.Chmod(addr, 0600); err != nil {
+		listener.Close()
+		return nil, err
+	}
+
+	return listener, nil
 }
 
 func watchTCPListener(ctx context.Context, address string, interval, firstRetry, timeout time.Duration, maxFailures int) <-chan error {
+	return watchListener(ctx, "tcp", address, interval, firstRetry, timeout, maxFailures)
+}
+
+func watchListener(ctx context.Context, network, address string, interval, firstRetry, timeout time.Duration, maxFailures int) <-chan error {
 	done := make(chan error, 1)
 
 	go func() {
@@ -194,7 +222,7 @@ func watchTCPListener(ctx context.Context, address string, interval, firstRetry,
 		}
 
 		probe := func() bool {
-			conn, err := net.DialTimeout("tcp", address, timeout)
+			conn, err := net.DialTimeout(network, address, timeout)
 			if err == nil {
 				_ = conn.Close()
 				failures = 0
