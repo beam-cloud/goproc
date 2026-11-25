@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"errors"
+	"os"
 	"os/exec"
 	"testing"
 	"time"
@@ -216,19 +217,15 @@ func TestOutputDrainSurvivesMoreThanOneCPUQuotaPeriod(t *testing.T) {
 }
 
 func TestOutputDrainFailureCannotReportStatusSuccess(t *testing.T) {
+	t.Parallel()
 	proc, err := NewProcess(context.Background())
 	if err != nil {
 		t.Fatal(err)
 	}
-	cmd := exec.Command("sh", "-c", "sleep 0.2 & printf owned-output")
-	cmd.WaitDelay = 10 * time.Millisecond
-	proc.cmd = cmd
-	proc.stdoutBuf = &SafeBuffer{}
-	proc.stderrBuf = &SafeBuffer{}
-	cmd.Stdout, cmd.Stderr = proc.stdoutBuf, proc.stderrBuf
-	if err := cmd.Start(); err != nil {
+	if _, err := proc.Exec([]string{"sh", "-c", "sleep 4 & printf owned-output"}, "/", os.Environ(), false); err != nil {
 		t.Fatal(err)
 	}
+	defer proc.Kill()
 	code, err := proc.Wait()
 	if !errors.Is(err, exec.ErrWaitDelay) {
 		t.Fatalf("Wait error=%v; want ErrWaitDelay", err)

@@ -36,6 +36,8 @@ type Process struct {
 	waitErr   error
 	started   chan struct{}
 	startOnce sync.Once
+	drains    []*outputDrain
+	drained   chan error
 }
 
 func NewProcess(ctx context.Context) (*Process, error) {
@@ -77,16 +79,15 @@ func (p *Process) exec(args []string, cwd string, env []string, wait bool, sink 
 	p.cancel = cancel
 	p.stdoutBuf = &SafeBuffer{}
 	p.stderrBuf = &SafeBuffer{}
-	p.cmd.Stdout = p.stdoutBuf
-	p.cmd.Stderr = p.stderrBuf
+	var stdout, stderr io.Writer = p.stdoutBuf, p.stderrBuf
 	if sink != nil {
-		p.cmd.Stdout = &processLogWriter{
+		stdout = &processLogWriter{
 			stream: ProcessStreamStdout,
 			buffer: p.stdoutBuf,
 			sink:   sink,
 			kill:   p.killFromLogWriter,
 		}
-		p.cmd.Stderr = &processLogWriter{
+		stderr = &processLogWriter{
 			stream: ProcessStreamStderr,
 			buffer: p.stderrBuf,
 			sink:   sink,
@@ -95,7 +96,7 @@ func (p *Process) exec(args []string, cwd string, env []string, wait bool, sink 
 	}
 
 	preloadExecutable(p.cmd)
-	err := p.start()
+	err := p.startWithOutput(stdout, stderr)
 	if err != nil {
 		return -1, err
 	}
@@ -116,6 +117,56 @@ func (p *Process) exec(args []string, cwd string, env []string, wait bool, sink 
 	}
 
 	return p.pid, nil
+}
+
+// startWithOutput starts the process with pipes that outlive it, for background
+// children that inherit them.
+func (p *Process) startWithOutput(stdout, stderr io.Writer) error {
+	stdoutR, stdoutW, err := os.Pipe()
+	if err != nil {
+		return err
+	}
+	defer stdoutW.Close()
+	stderrR, stderrW, err := os.Pipe()
+	if err != nil {
+		stdoutR.Close()
+		return err
+	}
+	defer stderrW.Close()
+
+	p.cmd.Stdout, p.cmd.Stderr = stdoutW, stderrW
+	if err := p.start(); err != nil {
+		stdoutR.Close()
+		stderrR.Close()
+		return err
+	}
+
+	p.drains = []*outputDrain{{r: stdoutR, dst: stdout}, {r: stderrR, dst: stderr}}
+	p.drained = make(chan error, len(p.drains))
+	for _, d := range p.drains {
+		go d.run(p.drained)
+	}
+	return nil
+}
+
+// waitForOutput waits for an exited process's pipes to close, for at most
+// processWaitDelay: a background child can hold them for as long as it runs.
+func (p *Process) waitForOutput() error {
+	timer := time.NewTimer(processWaitDelay)
+	defer timer.Stop()
+	var firstErr error
+	for range p.drains {
+		select {
+		case err := <-p.drained:
+			if firstErr == nil {
+				firstErr = err
+			}
+		case <-timer.C:
+			stopDrains(p.drains)
+			return exec.ErrWaitDelay
+		}
+	}
+	return firstErr
 }
 
 func (p *Process) markStarted() {
@@ -204,6 +255,9 @@ func (p *Process) Wait() (int, error) {
 func (p *Process) waitForExit() {
 	p.waitOnce.Do(func() {
 		err := p.cmd.Wait()
+		if outputErr := p.waitForOutput(); err == nil {
+			err = outputErr
+		}
 
 		p.mu.Lock()
 		defer p.mu.Unlock()
